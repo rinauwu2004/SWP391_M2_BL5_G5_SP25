@@ -5,7 +5,6 @@
 package vn.edu.fpt.controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +13,6 @@ import jakarta.servlet.http.HttpSession;
 import java.sql.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import vn.edu.fpt.dao.CountryDao;
 import vn.edu.fpt.dao.UserDao;
 import vn.edu.fpt.model.Country;
 import vn.edu.fpt.model.User;
@@ -28,14 +26,13 @@ public class OTPVerificationController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("OTPVerification.jsp").forward(request, response);
+        request.getRequestDispatcher("/OTPVerification.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        CountryDao countryDao = new CountryDao();
         UserDao userDao = new UserDao();
 
         String otp = request.getParameter("otp");
@@ -60,7 +57,18 @@ public class OTPVerificationController extends HttpServlet {
         String phoneNumber = (String) session.getAttribute("phoneNumber");
         String emailAddress = (String) session.getAttribute("email");
         String address = (String) session.getAttribute("address");
-        
+
+        System.out.println("username: " + username);
+        System.out.println("passwordHash: " + passwordHash);
+        System.out.println("passwordSalt: " + passwordSalt);
+        System.out.println("firstName: " + firstName);
+        System.out.println("lastName: " + lastName);
+        System.out.println("dob: " + dob);
+        System.out.println("country: " + country);
+        System.out.println("phoneNumber: " + phoneNumber);
+        System.out.println("emailAddress: " + emailAddress);
+        System.out.println("address: " + address);
+
         if (username == null || passwordHash == null || passwordSalt == null
                 || firstName == null || lastName == null || dob == null
                 || country == null || phoneNumber == null || emailAddress == null
@@ -84,9 +92,10 @@ public class OTPVerificationController extends HttpServlet {
 
         try {
             userDao.addUser(user);
-            System.out.println("✅ User inserted successfully: " + username);
-            response.sendRedirect(request.getContextPath() + "/Signin.jsp");
-        } catch (Exception ex) {
+            String message = "Sign up successfully. Now you can sign in!";
+            request.setAttribute("message", message);
+            request.getRequestDispatcher("/Signin.jsp").forward(request, response);
+        } catch (ServletException | IOException ex) {
             System.out.println("❌ Error inserting user: " + ex.getMessage());
             Logger.getLogger(OTPVerificationController.class.getName()).log(Level.SEVERE, null, ex);
 

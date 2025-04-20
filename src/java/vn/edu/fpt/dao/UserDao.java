@@ -29,8 +29,8 @@ public class UserDao extends DBContext {
             stm.setString(1, user.getUsername());
             stm.setString(2, user.getHashPassword());
             stm.setString(3, user.getSaltPassword());
-            stm.setString(4, user.getFirstName());
-            stm.setString(5, user.getLastName());
+            stm.setNString(4, user.getFirstName());
+            stm.setNString(5, user.getLastName());
             stm.setDate(6, user.getDob());
             stm.setInt(7, user.getCountry().getId());
             stm.setString(8, user.getPhoneNumber());
@@ -91,7 +91,7 @@ public class UserDao extends DBContext {
     }
 
     public boolean isUsernameTaken(String username) {
-        String sql = "SELECT 1 FROM User WHERE username = ?";
+        String sql = "SELECT 1 FROM [User] WHERE [username] = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
             try (ResultSet rs = ps.executeQuery()) {
@@ -104,7 +104,7 @@ public class UserDao extends DBContext {
     }
 
     public boolean isEmailTaken(String email) {
-        String sql = "SELECT 1 FROM User WHERE email_address = ?";
+        String sql = "SELECT 1 FROM [User] WHERE [email_address] = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
@@ -117,7 +117,7 @@ public class UserDao extends DBContext {
     }
 
     public boolean isPhoneTaken(String phone) {
-        String sql = "SELECT 1 FROM User WHERE phone_number = ?";
+        String sql = "SELECT 1 FROM [User] WHERE [phone_number] = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, phone);
             try (ResultSet rs = ps.executeQuery()) {
