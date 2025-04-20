@@ -2,11 +2,20 @@ CREATE DATABASE [SWP391_M2_BL5]
 USE [SWP391_M2_BL5]
 GO
 
+CREATE TABLE [Country] (
+	[id] INT IDENTITY(1,1),
+	[name] NVARCHAR(50) NOT NULL,
+	[code] VARCHAR(10) NOT NULL,
+	[prefix] VARCHAR(10) NOT NULL,
+
+	CONSTRAINT PK_Country PRIMARY KEY ([id])
+);
+
 CREATE TABLE [UserStatus] (
 	[id] int IDENTITY(1,1),
 	[name] varchar(50) NOT NULL,
 
-	CONSTRAINT PK_UserStatus PRIMARY KEY ([id]),
+	CONSTRAINT PK_UserStatus PRIMARY KEY ([id])
 )
 
 CREATE TABLE [User] (
@@ -17,14 +26,16 @@ CREATE TABLE [User] (
 	[first_name] varchar(20) NOT NULL,
 	[last_name] varchar(20) NOT NULL,
 	[date_of_birth] date NOT NULL,
-	[phone_number] int UNIQUE NOT NULL,
+	[country_id] int NOT NULL,
+	[phone_number] varchar(20) UNIQUE NOT NULL,
 	[email_address] varchar(255) UNIQUE NOT NULL,
 	[address] text NOT NULL,
 	[status_id] int,
 	[created_at] datetime DEFAULT(GETDATE()),
 
 	CONSTRAINT PK_User PRIMARY KEY ([id]),
-	CONSTRAINT FK_User_UserStatus FOREIGN KEY ([status_id]) REFERENCES [UserStatus]([id]) ON UPDATE CASCADE
+	CONSTRAINT FK_User_UserStatus FOREIGN KEY ([status_id]) REFERENCES [UserStatus]([id]) ON UPDATE CASCADE,
+	CONSTRAINT FK_User_Country FOREIGN KEY ([country_id]) REFERENCES [Country]([id])
 )
 
 CREATE TABLE [Role] (

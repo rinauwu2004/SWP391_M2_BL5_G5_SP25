@@ -1,8 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
-	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
-	 version="6.0">
-
+<web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
+    <servlet>
+        <servlet-name>SignupController</servlet-name>
+        <servlet-class>vn.edu.fpt.controller.SignupController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ResendOTPController</servlet-name>
+        <servlet-class>vn.edu.fpt.controller.ResendOTPController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>OTPVerificationController</servlet-name>
+        <servlet-class>vn.edu.fpt.controller.OTPVerificationController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SigninController</servlet-name>
+        <servlet-class>vn.edu.fpt.controller.SigninController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SignupController</servlet-name>
+        <url-pattern>/signup</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ResendOTPController</servlet-name>
+        <url-pattern>/resend</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OTPVerificationController</servlet-name>
+        <url-pattern>/verify</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SigninController</servlet-name>
+        <url-pattern>/signin</url-pattern>
+    </servlet-mapping>
 </web-app>
