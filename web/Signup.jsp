@@ -184,6 +184,11 @@
                 Please fill in your information to create an account
             </p>
 
+            <c:if test="${not empty sessionScope.error}">
+                <p style="margin-top: 5px; color:red; text-align: center; font-size: 14px;">${sessionScope.error}</p>
+                <c:remove var="error" scope="session"/>
+            </c:if>
+
             <form action="<%=request.getContextPath()%>/signup" method="post">
                 <div class="form-row">
                     <div class="form-group">
@@ -406,10 +411,13 @@
                 const cpw = document.getElementById("confirmPassword").value;
                 if (!cpw) {
                     showError("confirmPassword", "This field is required.");
+                    validFields["confirmPassword"] = false;
                 } else if (pw !== cpw) {
                     showError("confirmPassword", "Passwords do not match.");
+                    validFields["confirmPassword"] = false;
                 } else {
                     clearError("confirmPassword");
+                    validFields["confirmPassword"] = true;
                 }
             }
 
@@ -419,11 +427,13 @@
 
                 if (!bd) {
                     showError("birthdate", "This field is required.");
+                    validFields["birthdate"] = false;
                     return;
                 }
 
                 if (!regex.test(bd)) {
                     showError("birthdate", "Birthdate must follow yyyy-mm-dd format.");
+                    validFields["birthdate"] = false;
                     return;
                 }
 
@@ -438,18 +448,22 @@
 
                 if (inputDate >= today) {
                     showError("birthdate", "Birthdate must be in the past.");
+                    validFields["birthdate"] = false;
                     return;
                 }
 
                 clearError("birthdate");
+                validFields["birthdate"] = true;
             }
 
             function validateTerms() {
                 const checkbox = document.getElementById("terms");
                 if (!checkbox.checked) {
                     showError("terms", "You must agree to the terms.");
+                    validFields["terms"] = false;
                 } else {
                     clearError("terms");
+                    validFields["terms"] = true;
                 }
             }
 
@@ -457,26 +471,14 @@
                 const value = document.getElementById(fieldId).value.trim();
                 if (!value) {
                     showError(fieldId, "This field is required.");
-                    validFields[fieldId]=false;
+                    validFields[fieldId] = false;
                 } else if (validationFn && !validationFn(value)) {
                     showError(fieldId, errorMessage);
-                    validFields[fieldId]=false;
+                    validFields[fieldId] = false;
                 } else {
                     clearError(fieldId);
-                    validFields[fieldId]=true;
+                    validFields[fieldId] = true;
                 }
-            }
-
-            function onBlurValidate(fieldId, validationFn = null, errorMessage = "") {
-                const input = document.getElementById(fieldId);
-                input.addEventListener("blur", () => {
-                    touchedFields[fieldId] = true;
-                    validateField(fieldId, validationFn, errorMessage);
-
-                    if (validFields[fieldId]) {
-                        checkUnique(fieldId);
-                    }
-                });
             }
 
             function autoEnhanceInputs() {
@@ -529,21 +531,21 @@
 
                                     if (!data.valid) {
                                         showError("username", data.message);
-                                        validFields["username"]=false;
+                                        validFields["username"] = false;
                                     } else {
                                         clearError("username");
-                                        validFields["username"]=true;
+                                        validFields["username"] = true;
                                     }
                                 })
                                 .catch(() => {
                                     input.disabled = false;
                                     input.style.color = "";
                                     showError("username", "Unable to check uniqueness.");
-                                    validFields["username"]=false;
+                                    validFields["username"] = false;
                                 });
                     }
                 });
-                
+
                 document.getElementById("email").addEventListener("blur", () => {
                     touchedFields["email"] = true;
                     validateField("email", validateEmail, "Invalid email format.");
@@ -563,21 +565,21 @@
 
                                     if (!data.valid) {
                                         showError("email", data.message);
-                                        validFields["email"]=false;
+                                        validFields["email"] = false;
                                     } else {
                                         clearError("email");
-                                        validFields["email"]=true;
+                                        validFields["email"] = true;
                                     }
                                 })
                                 .catch(() => {
                                     input.disabled = false;
                                     input.style.color = "";
                                     showError("email", "Unable to check uniqueness.");
-                                    validFields["email"]=false;
+                                    validFields["email"] = false;
                                 });
                     }
                 });
-                
+
                 document.getElementById("phone").addEventListener("blur", () => {
                     touchedFields["phone"] = true;
                     validateField("phone", validatePhone, "Phone number must be between 9 and 15 digits.");
@@ -597,17 +599,17 @@
 
                                     if (!data.valid) {
                                         showError("phone", data.message);
-                                        validFields["phone"]=false;
+                                        validFields["phone"] = false;
                                     } else {
                                         clearError("phone");
-                                        validFields["phone"]=true;
+                                        validFields["phone"] = true;
                                     }
                                 })
                                 .catch(() => {
                                     input.disabled = false;
                                     input.style.color = "";
                                     showError("phone", "Unable to check uniqueness.");
-                                    validFields["phone"]=false;
+                                    validFields["phone"] = false;
                                 });
                     }
                 });
@@ -642,9 +644,17 @@
                 });
 
                 document.querySelector("form").addEventListener("submit", e => {
-                    validateTerms();
-                    if (document.querySelectorAll(".error-message:not(:empty)").length > 0) {
+                    let allValid = true;
+
+                    for (let fieldId in validFields) {
+                        if (validFields.hasOwnProperty(fieldId) && !validFields[fieldId]) {
+                            allValid = false;
+                            break;
+                        }
+                    }
+                    if (!allValid) {
                         e.preventDefault();
+                        alert("Please correct the errors before submitting the form.");
                     }
                 });
             });

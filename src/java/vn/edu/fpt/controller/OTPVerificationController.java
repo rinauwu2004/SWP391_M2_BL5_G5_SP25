@@ -38,15 +38,39 @@ public class OTPVerificationController extends HttpServlet {
         String otp = request.getParameter("otp");
         String otpStore = (String) session.getAttribute("otp");
 
+        Integer attemptCount = (Integer) session.getAttribute("attemptCount");
+        if (attemptCount == null) {
+            attemptCount = 0;
+        }
+        long currentTime = System.currentTimeMillis();
+
+        // Check OTP
         if (otp == null || !otp.equals(otpStore)) {
+            attemptCount++;
+            session.setAttribute("attemptCount", attemptCount);
+
+            if (attemptCount >= 5) {
+                session.setAttribute("lockTime", currentTime);
+                session.removeAttribute("otp");
+                session.removeAttribute("timeout");
+                session.removeAttribute("attemptCount");
+                session.setAttribute("error", "Unable to verify your account.");
+                response.sendRedirect(request.getContextPath() + "/signup");
+                return;
+            }
+
             request.setAttribute("otpInvalid", "Invalid OTP. Try again!!!");
             request.getRequestDispatcher("/OTPVerification.jsp").forward(request, response);
             return;
         }
 
+        // OTP is correct, clear session attributes
         session.removeAttribute("otp");
         session.removeAttribute("timeout");
+        session.removeAttribute("attemptCount");
+        session.removeAttribute("lockTime");
 
+        // Retrieve user data from session
         String username = (String) session.getAttribute("username");
         String passwordHash = (String) session.getAttribute("passwordHash");
         String passwordSalt = (String) session.getAttribute("passwordSalt");
@@ -57,17 +81,6 @@ public class OTPVerificationController extends HttpServlet {
         String phoneNumber = (String) session.getAttribute("phoneNumber");
         String emailAddress = (String) session.getAttribute("email");
         String address = (String) session.getAttribute("address");
-
-        System.out.println("username: " + username);
-        System.out.println("passwordHash: " + passwordHash);
-        System.out.println("passwordSalt: " + passwordSalt);
-        System.out.println("firstName: " + firstName);
-        System.out.println("lastName: " + lastName);
-        System.out.println("dob: " + dob);
-        System.out.println("country: " + country);
-        System.out.println("phoneNumber: " + phoneNumber);
-        System.out.println("emailAddress: " + emailAddress);
-        System.out.println("address: " + address);
 
         if (username == null || passwordHash == null || passwordSalt == null
                 || firstName == null || lastName == null || dob == null
@@ -92,15 +105,12 @@ public class OTPVerificationController extends HttpServlet {
 
         try {
             userDao.addUser(user);
-            String message = "Sign up successfully. Now you can sign in!";
-            request.setAttribute("message", message);
+            request.setAttribute("message", "Sign up successfully. Now you can sign in!");
             request.getRequestDispatcher("/Signin.jsp").forward(request, response);
-        } catch (ServletException | IOException ex) {
-            System.out.println("❌ Error inserting user: " + ex.getMessage());
+        } catch (Exception ex) {
             Logger.getLogger(OTPVerificationController.class.getName()).log(Level.SEVERE, null, ex);
-
             request.setAttribute("error", "Something went wrong while creating your account. Please try again.");
-            request.getRequestDispatcher("OTPVerification.jsp").forward(request, response);
+            request.getRequestDispatcher("/OTPVerification.jsp").forward(request, response);
         }
     }
 
