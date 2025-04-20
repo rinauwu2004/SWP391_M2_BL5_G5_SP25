@@ -1,0 +1,357 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package vn.edu.fpt.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import vn.edu.fpt.model.Subject;
+
+public class SubjectDAO extends DBContext {
+
+    private static final Logger LOGGER = Logger.getLogger(SubjectDAO.class.getName());
+
+    public int getTotalSubjects() {
+        int total = 0;
+        String query = "SELECT COUNT(*) FROM [Subject]";
+
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = new DBContext().connection;
+            stmt = conn.prepareStatement(query);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                total = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error counting subjects: {0}", e.getMessage());
+            throw new RuntimeException("Error counting subjects", e);
+        }
+
+        return total;
+    }
+
+    public List<Subject> getSubjects(int start, int recordsPerPage) {
+        List<Subject> subjects = new ArrayList<>();
+        String query = "SELECT [id], [code], [name], [description], [status], [created_at], [modified_at] "
+                + "FROM [Subject] "
+                + "ORDER BY [id] "
+                + // You can change this to any column based on your sorting needs
+                "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"; // SQL Server pagination
+
+        try (Connection conn = new DBContext().connection; PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            // Setting parameters for pagination
+            stmt.setInt(1, start); // The OFFSET value
+            stmt.setInt(2, recordsPerPage); // The number of records per page
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (conn == null || conn.isClosed()) {
+                    LOGGER.log(Level.SEVERE, "Database connection is null or closed");
+                    throw new SQLException("Invalid database connection");
+                }
+
+                while (rs.next()) {
+                    Subject subject = new Subject();
+                    subject.setId(rs.getInt("id"));
+                    subject.setCode(rs.getString("code"));
+                    subject.setName(rs.getString("name"));
+                    subject.setDescription(rs.getString("description"));
+                    subject.setStatus(rs.getBoolean("status"));
+                    subject.setCreatedAt(rs.getTimestamp("created_at"));
+                    subject.setModifiedAt(rs.getTimestamp("modified_at"));
+                    subjects.add(subject);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error retrieving subjects: {0}", e.getMessage());
+            throw new RuntimeException("Error retrieving subjects", e);
+        }
+
+        return subjects;
+    }
+
+    public void insertSubject(Subject subject) {
+        String query = "INSERT INTO [Subject] "
+                + "([code], [name], [description], [status], [created_at], [modified_at]) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = new DBContext().connection; PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            if (conn == null || conn.isClosed()) {
+                LOGGER.log(Level.SEVERE, "Database connection is null or closed");
+                throw new SQLException("Invalid database connection");
+            }
+
+            if (subject == null || subject.getCode() == null || subject.getName() == null || subject.getCreatedAt() == null) {
+                LOGGER.log(Level.SEVERE, "Invalid subject data provided for insertion");
+                throw new IllegalArgumentException("Subject data is incomplete");
+            }
+
+            stmt.setString(1, subject.getCode());
+            stmt.setString(2, subject.getName());
+            stmt.setString(3, subject.getDescription());
+            stmt.setBoolean(4, subject.isStatus());
+            stmt.setTimestamp(5, new java.sql.Timestamp(subject.getCreatedAt().getTime()));
+            stmt.setTimestamp(6, subject.getModifiedAt() != null
+                    ? new java.sql.Timestamp(subject.getModifiedAt().getTime()) : null);
+
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error inserting subject: {0}", e.getMessage());
+            throw new RuntimeException("Error inserting subject", e);
+        }
+    }
+
+    public Subject getSubjectById(int id) {
+        String query = "SELECT [id], [code], [name], [description], [status], [created_at], [modified_at] "
+                + "FROM [Subject] WHERE [id] = ?";
+        try (Connection conn = new DBContext().connection; PreparedStatement stmt = conn.prepareStatement(query)) {
+            if (conn == null || conn.isClosed()) {
+                LOGGER.log(Level.SEVERE, "Database connection is null or closed");
+                throw new SQLException("Invalid database connection");
+            }
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Subject subject = new Subject();
+                    subject.setId(rs.getInt("id"));
+                    subject.setCode(rs.getString("code"));
+                    subject.setName(rs.getString("name"));
+                    subject.setDescription(rs.getString("description"));
+                    subject.setStatus(rs.getBoolean("status"));
+                    subject.setCreatedAt(rs.getTimestamp("created_at"));
+                    subject.setModifiedAt(rs.getTimestamp("modified_at"));
+                    return subject;
+                }
+                return null;
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error retrieving subject by ID {0}: {1}", new Object[]{id, e.getMessage()});
+            throw new RuntimeException("Error retrieving subject", e);
+        }
+    }
+
+    public boolean addSubject(Subject subject) {
+        String query = "INSERT INTO [Subject] ([code], [name], [description], [status], [created_at], [modified_at]) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = new DBContext().connection; PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            if (conn == null || conn.isClosed()) {
+                LOGGER.log(Level.SEVERE, "Database connection is null or closed");
+                throw new SQLException("Invalid database connection");
+            }
+
+            if (subject == null || subject.getCode() == null || subject.getName() == null || subject.getCreatedAt() == null
+                    || subject.getCode().trim().isEmpty() || subject.getName().trim().isEmpty()) {
+                LOGGER.log(Level.SEVERE, "Invalid subject data provided for insertion");
+                throw new IllegalArgumentException("Subject data is incomplete or invalid");
+            }
+
+            stmt.setString(1, subject.getCode());
+            stmt.setString(2, subject.getName());
+            stmt.setString(3, subject.getDescription());
+            stmt.setBoolean(4, subject.isStatus());
+            stmt.setTimestamp(5, new java.sql.Timestamp(subject.getCreatedAt().getTime()));
+            stmt.setTimestamp(6, subject.getModifiedAt() != null
+                    ? new java.sql.Timestamp(subject.getModifiedAt().getTime()) : null);
+
+            stmt.executeUpdate();
+            return true;
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error adding subject: {0}", e.getMessage());
+            throw new RuntimeException("Error adding subject", e);
+        }
+    }
+
+    public boolean editSubject(String subjectId, String code, String name, String status, String description) {
+        String query = "UPDATE [Subject] SET [code] = ?, [name] = ?, [description] = ?, [status] = ?, [modified_at] = ? "
+                + "WHERE [id] = ?";
+
+        try (Connection conn = new DBContext().connection; PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            if (conn == null || conn.isClosed()) {
+                LOGGER.log(Level.SEVERE, "Database connection is null or closed");
+                throw new SQLException("Invalid database connection");
+            }
+
+            if (subjectId == null || subjectId.trim().isEmpty()
+                    || code == null || code.trim().isEmpty()
+                    || name == null || name.trim().isEmpty()) {
+                LOGGER.log(Level.SEVERE, "Invalid subject data provided for update: ID, code, or name is null or empty");
+                return false;
+            }
+
+            int id;
+            try {
+                id = Integer.parseInt(subjectId);
+            } catch (NumberFormatException e) {
+                LOGGER.log(Level.SEVERE, "Invalid subject ID format: {0}", subjectId);
+                return false;
+            }
+
+            boolean statusBool = status != null && status.equalsIgnoreCase("true");
+
+            stmt.setString(1, code.trim());
+            stmt.setString(2, name.trim());
+            stmt.setString(3, description != null ? description.trim() : null);
+            stmt.setBoolean(4, statusBool);
+            stmt.setTimestamp(5, new java.sql.Timestamp(System.currentTimeMillis())); // Current time for modified_at
+            stmt.setInt(6, id);
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error updating subject with ID {0}: {1}", new Object[]{subjectId, e.getMessage()});
+            return false;
+        }
+    }
+
+    public int getTotalSubjectsFiltered(String search, Boolean status) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM Subject WHERE 1=1");
+
+        // Gộp điều kiện tìm kiếm tên hoặc mã
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append(" AND (name LIKE ? OR code LIKE ?)");
+        }
+        if (status != null) {
+            sql.append(" AND status = ?");
+        }
+
+        try (Connection conn = new DBContext().connection; PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+
+            int index = 1;
+            if (search != null && !search.trim().isEmpty()) {
+                stmt.setString(index++, "%" + search + "%");  // name
+                stmt.setString(index++, "%" + search + "%");  // code
+            }
+            if (status != null) {
+                stmt.setBoolean(index, status);
+            }
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Lỗi khi đếm số môn học có lọc", e);
+        }
+
+        return 0;
+    }
+
+    public List<Subject> getSubjectsFiltered(String search, Boolean status, int start, int recordsPerPage) {
+        List<Subject> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM Subject WHERE 1=1");
+
+        // Sửa lại phần search để truy vấn cả 'name' và 'code'
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append(" AND (name LIKE ? OR code LIKE ?)");
+        }
+        if (status != null) {
+            sql.append(" AND status = ?");
+        }
+
+        sql.append(" ORDER BY id OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+
+        try (Connection conn = new DBContext().connection; PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+
+            int index = 1;
+            if (search != null && !search.trim().isEmpty()) {
+                stmt.setString(index++, "%" + search.trim() + "%");  // Tìm kiếm theo 'name'
+                stmt.setString(index++, "%" + search.trim() + "%");  // Tìm kiếm theo 'code'
+            }
+            if (status != null) {
+                stmt.setBoolean(index++, status);
+            }
+
+            stmt.setInt(index++, start);  // OFFSET
+            stmt.setInt(index, recordsPerPage);  // FETCH NEXT
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Subject subject = new Subject();
+                subject.setId(rs.getInt("id"));
+                subject.setCode(rs.getString("code"));
+                subject.setName(rs.getString("name"));
+                subject.setDescription(rs.getString("description"));
+                subject.setStatus(rs.getBoolean("status"));
+                subject.setCreatedAt(rs.getTimestamp("created_at"));
+                subject.setModifiedAt(rs.getTimestamp("modified_at"));
+                list.add(subject);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Lỗi khi lấy danh sách môn học có lọc", e);
+        }
+        return list;
+    }
+
+    public boolean deleteSubjectById(int id) {
+        String query = "DELETE FROM [Subject] WHERE [id] = ?";
+
+        try (Connection conn = new DBContext().connection; PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            if (conn == null || conn.isClosed()) {
+                LOGGER.log(Level.SEVERE, "Database connection is null or closed");
+                throw new SQLException("Invalid database connection");
+            }
+
+            stmt.setInt(1, id);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error deleting subject with ID {0}: {1}", new Object[]{id, e.getMessage()});
+            throw new RuntimeException("Error deleting subject", e);
+        }
+    }
+    
+    public boolean deactivateSubjectById(int id) {
+    String query = "UPDATE [Subject] SET [status] = 0, [modified_at] = GETDATE() WHERE [id] = ?";
+
+    try (Connection conn = new DBContext().connection;
+         PreparedStatement stmt = conn.prepareStatement(query)) {
+
+        if (conn == null || conn.isClosed()) {
+            LOGGER.log(Level.SEVERE, "Database connection is null or closed");
+            throw new SQLException("Invalid database connection");
+        }
+
+        stmt.setInt(1, id);
+        int rowsAffected = stmt.executeUpdate();
+        return rowsAffected > 0;
+
+    } catch (SQLException e) {
+        LOGGER.log(Level.SEVERE, "Error deactivating subject with ID {0}: {1}", new Object[]{id, e.getMessage()});
+        throw new RuntimeException("Error deactivating subject", e);
+    }
+}
+
+
+    public static void main(String[] args) {
+        SubjectDAO sdao = new SubjectDAO();
+        String search = "";
+        Boolean status = null;
+
+        List<Subject> subjects = sdao.getSubjectsFiltered(search, status, 0, 5);
+        for (Subject subject : subjects) {
+            System.out.println(subject.toString());
+        }
+
+    }
+}
