@@ -30,6 +30,16 @@ public class SigninController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("remember_username".equals(cookie.getName())) {
+                    request.setAttribute("savedUsername", cookie.getValue());
+                    break;
+                }
+            }
+        }
+        
         request.getRequestDispatcher("/Signin.jsp").forward(request, response);
     }
 
@@ -47,14 +57,17 @@ public class SigninController extends HttpServlet {
                 boolean matched = checkPassword(password, user.getHashPassword(), user.getSaltPassword());
                 if (matched) {
                     request.getSession().setAttribute("user", user);
-
                     if ("on".equals(remember)) {
-                        Cookie userCookie = new Cookie("remember_username", username);
-                        userCookie.setMaxAge(7 * 24 * 60 * 60);
-                        response.addCookie(userCookie);
+                        Cookie usernameCookie = new Cookie("remember_username", username);
+                        usernameCookie.setMaxAge(7 * 24 * 60 * 60);
+                        response.addCookie(usernameCookie);
+                    } else {
+                        Cookie usernameCookie = new Cookie("remember_username", "");
+                        usernameCookie.setMaxAge(0);
+                        response.addCookie(usernameCookie);
                     }
 
-                    response.sendRedirect(request.getContextPath() + "/index.html");
+                    response.sendRedirect(request.getContextPath() + "/home");
                 } else {
                     request.setAttribute("error", "Invalid username or password.");
                     request.getRequestDispatcher("/Signin.jsp").forward(request, response);

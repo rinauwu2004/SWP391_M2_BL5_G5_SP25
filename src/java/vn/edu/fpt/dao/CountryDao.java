@@ -48,7 +48,6 @@ public class CountryDao extends DBContext{
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setString(1, code);
             stm.setString(2, code);
-            stm.setString(3, code);
             ResultSet rs = stm.executeQuery();
             if (rs.next()){
                 country = new Country();
