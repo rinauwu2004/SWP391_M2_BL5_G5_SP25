@@ -106,6 +106,17 @@ public class SignupController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        HttpSession session = request.getSession();
+        Long lockTime = (Long) session.getAttribute("lockTime");
+        long currentTime = System.currentTimeMillis();
+
+        if (lockTime != null && (currentTime - lockTime) < 15 * 60 * 1000) {
+            session.setAttribute("error", "Unable to verify your account.");
+            response.sendRedirect(request.getContextPath() + "/signup");
+            return;
+        }
+
         CountryDao countryDao = new CountryDao();
 
         // Get data from form
@@ -139,7 +150,6 @@ public class SignupController extends HttpServlet {
             Logger.getLogger(SignupController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        HttpSession session = request.getSession();
         session.setAttribute("username", username);
         session.setAttribute("passwordHash", passwordHash);
         session.setAttribute("passwordSalt", passwordSalt);

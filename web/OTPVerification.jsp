@@ -153,8 +153,16 @@
             <c:if test="${not empty error}">
                 <div style="color:red;">${error}</div>
             </c:if>
+
             <c:if test="${not empty otpInvalid}">
-                <div style="color:red;">${otpInvalid}</div>
+                <div style="color:red; font-size: 14px;">${otpInvalid}</div>
+            </c:if>
+
+            <c:if test="${not empty sessionScope.attemptCount}">
+                <c:set var="remainingAttempts" value="${5 - sessionScope.attemptCount}" />
+                <div style="color:#525252; margin-top: 4px; font-size: 14px;">
+                    You have <strong>${remainingAttempts}</strong> attempt(s) left.
+                </div>
             </c:if>
 
             <p class="expiry">Code expires in: <span id="countdown">--:--</span></p>
