@@ -48,7 +48,7 @@
                 <h3>Quiz<span>Online</span></h3>
             </div>
             <div class="sidebar-menu">
-                <a href="${pageContext.request.contextPath}/admin/dashboard" class="menu-item">
+                <a href="${pageContext.request.contextPath}/admin/dashboard.jsp" class="menu-item">
                     <i class="fas fa-tachometer-alt"></i>
                     <span>Dashboard</span>
                 </a>
@@ -92,7 +92,7 @@
                     <div>
                         <h1>Edit User</h1>
                         <ul class="breadcrumb">
-                            <li><a href="${pageContext.request.contextPath}/admin/dashboard">Home</a></li>
+                            <li><a href="${pageContext.request.contextPath}/admin/dashboard.jsp">Home</a></li>
                             <li><a href="${pageContext.request.contextPath}/admin/users">User Management</a></li>
                             <li>Edit User</li>
                         </ul>
