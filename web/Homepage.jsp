@@ -22,7 +22,7 @@
             <div class="container">
                 <div class="navbar">
                     <div class="logo">
-                        <a href="index.jsp">
+                        <a href="<%=request.getContextPath()%>/home">
                             <span class="logo-icon"><i class="fas fa-puzzle-piece"></i></span>
                             <span class="logo-text">QuizMaster</span>
                         </a>
@@ -186,7 +186,7 @@
             <div class="container">
                 <h2>Ready to Test Your Knowledge?</h2>
                 <p>Join thousands of users and start your learning journey today!</p>
-                <a href="signup.jsp" class="btn btn-light">
+                <a href="<%=request.getContextPath()%>/signup" class="btn btn-light">
                     Create Free Account
                     <i class="fas fa-arrow-right"></i>
                 </a>
