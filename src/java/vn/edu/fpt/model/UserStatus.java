@@ -6,13 +6,19 @@ package vn.edu.fpt.model;
 
 /**
  *
- * @author Rinaaaa
+ * @author ADMIN
  */
 public class UserStatus {
     private int id;
     private String name;
 
-    public UserStatus() {}
+    public UserStatus() {
+    }
+
+    public UserStatus(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
     public int getId() {
         return id;
@@ -29,4 +35,7 @@ public class UserStatus {
     public void setName(String name) {
         this.name = name;
     }
+    
+    
+    
 }

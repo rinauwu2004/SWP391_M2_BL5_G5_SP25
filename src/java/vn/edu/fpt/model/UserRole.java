@@ -6,14 +6,23 @@ package vn.edu.fpt.model;
 
 /**
  *
- * @author Rinaaaa
+ * @author ADMIN
  */
 public class UserRole {
     private int id;
-    private User user;
-    private Role role;
+    private int user_id;
+    private int role_id;
+
+    public UserRole() {
+    }
+
     
-    public UserRole() {}
+    
+    public UserRole(int id, int user_id, int role_id) {
+        this.id = id;
+        this.user_id = user_id;
+        this.role_id = role_id;
+    }
 
     public int getId() {
         return id;
@@ -23,19 +32,21 @@ public class UserRole {
         this.id = id;
     }
 
-    public User getUser() {
-        return user;
+    public int getUser_id() {
+        return user_id;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUser_id(int user_id) {
+        this.user_id = user_id;
     }
 
-    public Role getRole() {
-        return role;
+    public int getRole_id() {
+        return role_id;
     }
 
-    public void setRole(Role role) {
-        this.role = role;
+    public void setRole_id(int role_id) {
+        this.role_id = role_id;
     }
+    
+    
 }
