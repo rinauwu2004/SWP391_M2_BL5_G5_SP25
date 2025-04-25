@@ -184,6 +184,11 @@
                 Please fill in your information to create an account
             </p>
 
+            <c:if test="${not empty sessionScope.error}">
+                <p style="margin-top: 5px; color:red; text-align: center; font-size: 14px;">${sessionScope.error}</p>
+                <c:remove var="error" scope="session"/>
+            </c:if>
+
             <form action="<%=request.getContextPath()%>/signup" method="post">
                 <div class="form-row">
                     <div class="form-group">
@@ -216,7 +221,7 @@
                     <div class="form-group">
                         <label for="birthdate">Birthdate</label>
                         <div class="input-wrapper">
-                            <input type="text" id="birthdate" name="birthdate" placeholder="mm/dd/yyyy" required />
+                            <input type="text" id="birthdate" name="birthdate" placeholder="yyyy-mm-dd" required />
                             <span class="input-status" id="birthdateStatus"></span>
                         </div>
                         <div class="error-message" id="birthdateError"></div>
@@ -293,7 +298,7 @@
                 <button type="submit" class="submit-btn">Create Account</button>
 
                 <div class="login-link">
-                    Already have an account? <a href="Signin.jsp" class="sign-in-link">Sign In</a>
+                    Already have an account? <a href="signin" class="sign-in-link">Sign In</a>
                 </div>
             </form>
         </div>
@@ -366,30 +371,22 @@
                 }
             }
 
-            function validateUsername(username) {
+            function validateUsername() {
+                const username = document.getElementById("username").value;
                 const regex = /^[A-Za-z0-9_.]{5,}$/;
                 return regex.test(username);
             }
 
-            function validateEmail(email) {
+            function validateEmail() {
+                const email = document.getElementById("email").value;
                 const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 return regex.test(email);
             }
 
-            function validatePhone(phone) {
+            function validatePhone() {
+                const phone = document.getElementById("phone").value;
                 const regex = /^[0-9]{9,15}$/;
                 return regex.test(phone);
-            }
-
-            function validateField(fieldId, validationFn, errorMessage) {
-                const value = document.getElementById(fieldId).value.trim();
-                if (!value) {
-                    showError(fieldId, "This field is required.");
-                } else if (validationFn && !validationFn(value)) {
-                    showError(fieldId, errorMessage);
-                } else {
-                    clearError(fieldId);
-                }
             }
 
             function validateFirstName() {
@@ -414,97 +411,74 @@
                 const cpw = document.getElementById("confirmPassword").value;
                 if (!cpw) {
                     showError("confirmPassword", "This field is required.");
+                    validFields["confirmPassword"] = false;
                 } else if (pw !== cpw) {
                     showError("confirmPassword", "Passwords do not match.");
+                    validFields["confirmPassword"] = false;
                 } else {
                     clearError("confirmPassword");
+                    validFields["confirmPassword"] = true;
                 }
             }
 
             function validateBirthdate() {
-                const bd = document.getElementById("birthdate").value;
-                const regex = /^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/\d{4}$/;
+                const bd = document.getElementById("birthdate").value.trim();
+                const regex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+
                 if (!bd) {
                     showError("birthdate", "This field is required.");
-                } else if (!regex.test(bd)) {
-                    showError("birthdate", "Birthdate must follow MM/DD/YYYY format.");
-                } else {
-                    clearError("birthdate");
+                    validFields["birthdate"] = false;
+                    return;
                 }
 
-                const parts = bd.split("/");
-                const month = parseInt(parts[0], 10) - 1;
-                const day = parseInt(parts[1], 10);
-                const year = parseInt(parts[2], 10);
-                const inputDate = new Date(year, month, day);
+                if (!regex.test(bd)) {
+                    showError("birthdate", "Birthdate must follow yyyy-mm-dd format.");
+                    validFields["birthdate"] = false;
+                    return;
+                }
+
+                const parts = bd.split("-");
+                const year = parseInt(parts[0], 10);
+                const month = parseInt(parts[1], 10);
+                const day = parseInt(parts[2], 10);
+                const inputDate = new Date(year, month - 1, day);
 
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
 
                 if (inputDate >= today) {
                     showError("birthdate", "Birthdate must be in the past.");
-                } else {
-                    clearError("birthdate");
+                    validFields["birthdate"] = false;
+                    return;
                 }
+
+                clearError("birthdate");
+                validFields["birthdate"] = true;
             }
 
             function validateTerms() {
                 const checkbox = document.getElementById("terms");
                 if (!checkbox.checked) {
                     showError("terms", "You must agree to the terms.");
+                    validFields["terms"] = false;
                 } else {
                     clearError("terms");
+                    validFields["terms"] = true;
                 }
             }
 
-            function checkUnique(fieldId) {
-                const input = document.getElementById(fieldId);
-                const value = input.value.trim();
-                const statusIcon = document.getElementById(fieldId + "Status");
-
+            function validateField(fieldId, validationFn, errorMessage) {
+                const value = document.getElementById(fieldId).value.trim();
                 if (!value) {
-                    statusIcon.innerText = "";
+                    showError(fieldId, "This field is required.");
                     validFields[fieldId] = false;
-                    return;
+                } else if (validationFn && !validationFn(value)) {
+                    showError(fieldId, errorMessage);
+                    validFields[fieldId] = false;
+                } else {
+                    clearError(fieldId);
+                    validFields[fieldId] = true;
                 }
-
-                input.dataset.prev = value;
-                input.value = "...";
-                input.style.color = "gray";
-                input.disabled = true;
-                validFields[fieldId] = false;
-                updateStatusIcon(fieldId);
-
-                fetch("/SWP391_M2_BL5_G5_SP25/signup?check=" + fieldId + "&value=" + encodeURIComponent(value))
-                        .then(res => res.json())
-                        .then(data => {
-                            input.disabled = false;
-                            input.value = input.dataset.prev;
-                            input.style.color = "";
-                            if (!data.valid) {
-                                showError(fieldId, data.message);
-                            } else {
-                                clearError(fieldId);
-                            }
-                        })
-                        .catch(() => {
-                            input.disabled = false;
-                            input.value = input.dataset.prev;
-                            input.style.color = "";
-                            showError(fieldId, "Unable to check uniqueness.");
-                        });
-            }
-
-            function onBlurValidate(fieldId, validationFn = null, errorMessage = "") {
-                const input = document.getElementById(fieldId);
-                input.addEventListener("blur", () => {
-                    touchedFields[fieldId] = true;
-                    validateField(fieldId, validationFn, errorMessage);
-
-                    if (validFields[fieldId]) {
-                        checkUnique(fieldId);
-                    }
-                });
             }
 
             function autoEnhanceInputs() {
@@ -538,9 +512,107 @@
             window.addEventListener("DOMContentLoaded", () => {
                 autoEnhanceInputs();
 
-                onBlurValidate("username", validateUsername, "Username must be at least 5 characters, using letters, numbers, '_' or '.' only.");
-                onBlurValidate("email", validateEmail, "Invalid email format.");
-                onBlurValidate("phone", validatePhone, "Phone number must be between 9 and 15 digits.");
+                document.getElementById("username").addEventListener("blur", () => {
+                    touchedFields["username"] = true;
+                    validateField("username", validateUsername, "Username must have at least 5 letters.");
+                    if (validFields["username"]) {
+                        const input = document.getElementById("username");
+                        const value = input.value;
+
+                        fetch("/SWP391_M2_BL5_G5_SP25/signup?check=username&value=" + encodeURIComponent(value))
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (input.value !== value) {
+                                        return;
+                                    }
+
+                                    input.disabled = false;
+                                    input.style.color = "";
+
+                                    if (!data.valid) {
+                                        showError("username", data.message);
+                                        validFields["username"] = false;
+                                    } else {
+                                        clearError("username");
+                                        validFields["username"] = true;
+                                    }
+                                })
+                                .catch(() => {
+                                    input.disabled = false;
+                                    input.style.color = "";
+                                    showError("username", "Unable to check uniqueness.");
+                                    validFields["username"] = false;
+                                });
+                    }
+                });
+
+                document.getElementById("email").addEventListener("blur", () => {
+                    touchedFields["email"] = true;
+                    validateField("email", validateEmail, "Invalid email format.");
+                    if (validFields["email"]) {
+                        const input = document.getElementById("email");
+                        const value = input.value;
+
+                        fetch("/SWP391_M2_BL5_G5_SP25/signup?check=email&value=" + encodeURIComponent(value))
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (input.value !== value) {
+                                        return;
+                                    }
+
+                                    input.disabled = false;
+                                    input.style.color = "";
+
+                                    if (!data.valid) {
+                                        showError("email", data.message);
+                                        validFields["email"] = false;
+                                    } else {
+                                        clearError("email");
+                                        validFields["email"] = true;
+                                    }
+                                })
+                                .catch(() => {
+                                    input.disabled = false;
+                                    input.style.color = "";
+                                    showError("email", "Unable to check uniqueness.");
+                                    validFields["email"] = false;
+                                });
+                    }
+                });
+
+                document.getElementById("phone").addEventListener("blur", () => {
+                    touchedFields["phone"] = true;
+                    validateField("phone", validatePhone, "Phone number must be between 9 and 15 digits.");
+                    if (validFields["phone"]) {
+                        const input = document.getElementById("phone");
+                        const value = input.value;
+
+                        fetch("/SWP391_M2_BL5_G5_SP25/signup?check=phone&value=" + encodeURIComponent(value))
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (input.value !== value) {
+                                        return;
+                                    }
+
+                                    input.disabled = false;
+                                    input.style.color = "";
+
+                                    if (!data.valid) {
+                                        showError("phone", data.message);
+                                        validFields["phone"] = false;
+                                    } else {
+                                        clearError("phone");
+                                        validFields["phone"] = true;
+                                    }
+                                })
+                                .catch(() => {
+                                    input.disabled = false;
+                                    input.style.color = "";
+                                    showError("phone", "Unable to check uniqueness.");
+                                    validFields["phone"] = false;
+                                });
+                    }
+                });
 
                 document.getElementById("firstName").addEventListener("blur", () => {
                     touchedFields["firstName"] = true;
@@ -572,9 +644,17 @@
                 });
 
                 document.querySelector("form").addEventListener("submit", e => {
-                    validateTerms();
-                    if (document.querySelectorAll(".error-message:not(:empty)").length > 0) {
+                    let allValid = true;
+
+                    for (let fieldId in validFields) {
+                        if (validFields.hasOwnProperty(fieldId) && !validFields[fieldId]) {
+                            allValid = false;
+                            break;
+                        }
+                    }
+                    if (!allValid) {
                         e.preventDefault();
+                        alert("Please correct the errors before submitting the form.");
                     }
                 });
             });

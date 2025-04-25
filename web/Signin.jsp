@@ -155,7 +155,12 @@
             <div class="signin-header">
                 <h1>Sign in</h1>
                 <p>Enter your credentials to access your account</p>
+                <c:if test="${not empty message}">
+                    <p style="margin-top: 5px; color:green; text-align: center; font-size: 14px;">${message}</p>
+                </c:if>
             </div>
+
+
 
             <form action="<%=request.getContextPath()%>/signin" method="post">
                 <div class="form-group">
@@ -167,7 +172,7 @@
                             <circle cx="12" cy="7" r="4"></circle>
                             </svg>
                         </span>
-                        <input type="text" id="username" name="username" value="${param.username}" placeholder="Enter your username" required>
+                        <input type="text" id="username" name="username" value="${param.username != null ? param.username : (savedUsername != null ? savedUsername : '')}" placeholder="Enter your username" required>
                     </div>
                 </div>
 
@@ -185,7 +190,7 @@
                 </div>
 
                 <div class="remember-me">
-                    <input type="checkbox" id="remember-me" name="remember-me">
+                    <input type="checkbox" id="remember-me" name="remember-me" ${savedUsername != null ? "checked" : ""}>
                     <label for="remember-me">Remember me</label>
                 </div>
 
@@ -193,7 +198,7 @@
             </form>
 
             <div class="signup-link">
-                Don't have an account? <a href="signup.jsp">Sign up</a>
+                Don't have an account? <a href="signup">Sign up</a>
             </div>
 
             <c:if test="${not empty error}">
