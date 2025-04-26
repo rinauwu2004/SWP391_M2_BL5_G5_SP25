@@ -5,8 +5,6 @@
 package vn.edu.fpt.dao;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vn.edu.fpt.model.User;
@@ -42,17 +40,18 @@ public class UserDao extends DBContext {
         }
     }
 
-    public User getUserByUsername(String username) {
+    public User getUser(String input) {
         CountryDao countryDao = new CountryDao();
         User user = null;
         String sql = """
                  SELECT [id], [username], [password_hash], [password_salt], 
                         [first_name], [last_name], [date_of_birth], 
                         [country_id], [phone_number], [email_address], [address]
-                 FROM [User] WHERE [username] = ?
+                 FROM [User] WHERE [username] = ? OR [email_address] = ?
                  """;
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setString(1, username);
+            stm.setString(1, input);
+            stm.setString(2, input);
             ResultSet rs = stm.executeQuery();
             if (rs.next()) {
                 user = new User();
@@ -72,22 +71,6 @@ public class UserDao extends DBContext {
             Logger.getLogger(UserDao.class.getName()).log(Level.SEVERE, null, ex);
         }
         return user;
-    }
-
-    public List<User> list() {
-        List<User> users = new ArrayList<>();
-        String sql = """
-                    SELECT [id], [username], [password_hash], [password_salt],
-                    	   [first_name], [last_name], [date_of_birth], [country_id],
-                    	   [phone_number], [email_address], [address], [status_id], [created_at]
-                    FROM [dbo].[User]
-                    """;
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-
-        } catch (SQLException ex) {
-            Logger.getLogger(UserDao.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return users;
     }
 
     public boolean isUsernameTaken(String username) {

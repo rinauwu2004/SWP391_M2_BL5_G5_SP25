@@ -5,31 +5,25 @@
 package vn.edu.fpt.controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Base64;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 import vn.edu.fpt.dao.UserDao;
 import vn.edu.fpt.model.User;
+import static vn.edu.fpt.util.PasswordEncryption.checkPassword;
 
 /**
  *
  * @author Rinaaaa
  */
 public class SigninController extends HttpServlet {
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -40,6 +34,7 @@ public class SigninController extends HttpServlet {
             }
         }
         
+        request.setAttribute("googleLoginURL", vn.edu.fpt.util.GoogleLogin.getGoogleLoginURL());
         request.getRequestDispatcher("/Signin.jsp").forward(request, response);
     }
 
@@ -48,10 +43,10 @@ public class SigninController extends HttpServlet {
             throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        String remember = request.getParameter("remember-me");
+        String remember = request.getParameter("remember");
 
         UserDao userDao = new UserDao();
-        User user = userDao.getUserByUsername(username);
+        User user = userDao.getUser(username);
         if (user != null) {
             try {
                 boolean matched = checkPassword(password, user.getHashPassword(), user.getSaltPassword());
@@ -81,16 +76,7 @@ public class SigninController extends HttpServlet {
         }
     }
 
-    public static boolean checkPassword(String inputPassword, String storedHashBase64, String storedSaltBase64) throws Exception {
-        byte[] salt = Base64.getDecoder().decode(storedSaltBase64);
-        byte[] storedHash = Base64.getDecoder().decode(storedHashBase64);
-
-        PBEKeySpec spec = new PBEKeySpec(inputPassword.toCharArray(), salt, 10000, 256);
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-        byte[] inputHash = factory.generateSecret(spec).getEncoded();
-
-        return java.util.Arrays.equals(inputHash, storedHash);
-    }
+    
 
     /**
      * Returns a short description of the servlet.

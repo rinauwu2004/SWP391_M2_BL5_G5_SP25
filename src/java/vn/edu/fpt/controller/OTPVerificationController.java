@@ -107,7 +107,7 @@ public class OTPVerificationController extends HttpServlet {
             userDao.addUser(user);
             request.setAttribute("message", "Sign up successfully. Now you can sign in!");
             request.getRequestDispatcher("/Signin.jsp").forward(request, response);
-        } catch (Exception ex) {
+        } catch (ServletException | IOException ex) {
             Logger.getLogger(OTPVerificationController.class.getName()).log(Level.SEVERE, null, ex);
             request.setAttribute("error", "Something went wrong while creating your account. Please try again.");
             request.getRequestDispatcher("/OTPVerification.jsp").forward(request, response);
