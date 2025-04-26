@@ -3,7 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/dao/SubjectDAO.java</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25/web/views/admin/subject/addSubject.jsp</file>
             <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/dao/DBContext.java</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25/web/notification.jsp</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/controller/subject/DeleteSubjectServlet.java</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25/web/views/admin/subject/editSubject.jsp</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/controller/subject/AddSubjectServlet.java</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25/web/index.html</file>
         </group>
     </open-files>
 </project-private>
