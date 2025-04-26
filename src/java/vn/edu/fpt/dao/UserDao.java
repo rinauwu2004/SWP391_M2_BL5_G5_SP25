@@ -4,6 +4,7 @@
  */
 package vn.edu.fpt.dao;
 
+import com.oracle.wls.shaded.org.apache.bcel.generic.AALOAD;
 import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,11 +43,13 @@ public class UserDao extends DBContext {
 
     public User getUser(String input) {
         CountryDao countryDao = new CountryDao();
+        UserStatusDao userStatusDao = new UserStatusDao();
         User user = null;
         String sql = """
                  SELECT [id], [username], [password_hash], [password_salt], 
                         [first_name], [last_name], [date_of_birth], 
-                        [country_id], [phone_number], [email_address], [address]
+                        [country_id], [phone_number], [email_address], [address],
+                        [status_id], [created_at]
                  FROM [User] WHERE [username] = ? OR [email_address] = ?
                  """;
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
@@ -66,6 +69,8 @@ public class UserDao extends DBContext {
                 user.setPhoneNumber(rs.getString("phone_number"));
                 user.setEmailAddress(rs.getString("email_address"));
                 user.setAddress(rs.getString("address"));
+                user.setStatus(userStatusDao.get(rs.getInt("status_id")));
+                user.setCreatedAt(rs.getTimestamp("created_at"));
             }
         } catch (SQLException ex) {
             Logger.getLogger(UserDao.class.getName()).log(Level.SEVERE, null, ex);

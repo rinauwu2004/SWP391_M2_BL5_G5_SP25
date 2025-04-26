@@ -13,7 +13,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>QuizMaster - Test Your Knowledge</title>
-        <link rel="stylesheet" href="css/styles.css">
+        <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() + "/css/styles.css" %>">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     </head>
     <body>
@@ -39,7 +39,7 @@
                         <c:choose>
                             <c:when test="${not empty sessionScope.user}">
                                 <div class="user-greeting">
-                                    Hello, ${sessionScope.user.lastName} ${sessionScope.user.firstName}
+                                    <a href="<%=request.getContextPath()%>/user/view-profile">Hello, ${sessionScope.user.lastName} ${sessionScope.user.firstName}</a>
                                     <a href="<%=request.getContextPath()%>/signout" class="btn btn-outline btn-sm">Logout</a>
                                 </div>
                             </c:when>
@@ -52,7 +52,9 @@
                 </div>
             </div>
         </header>
-
+        <c:if test="${not empty message}">
+            <p style="margin-top: 10px; margin-bottom: 10px; color:green; text-align: center; font-size: 16px;">${message}</p>
+        </c:if>
         <!-- Hero Section -->
         <section class="hero">
             <div class="container">
@@ -66,7 +68,7 @@
                         </a>
                     </div>
                     <div class="hero-image">
-                        <img src="img/img.png" alt="Quiz Illustration">
+                        <img src="<%= request.getContextPath() + "/img/img.png" %>" alt="Quiz Illustration">
                     </div>
                 </div>
             </div>
@@ -234,11 +236,11 @@
                 </div>
                 <div class="footer-bottom">
                     <p>&copy; <c:set var="now" value="<%= new java.util.Date() %>" />
-                    <fmt:formatDate value="${now}" pattern="yyyy" /> QuizMaster. All rights reserved.</p>
+                        <fmt:formatDate value="${now}" pattern="yyyy" /> QuizMaster. All rights reserved.</p>
                 </div>
             </div>
         </footer>
 
-        <script src="js/scripts.js"></script>
+        <script type="text/javascript" src="<%= request.getContextPath() + "/js/scripts.js" %>"></script>
     </body>
 </html>

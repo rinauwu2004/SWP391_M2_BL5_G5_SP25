@@ -78,12 +78,6 @@ public class ResetPasswordController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Boolean otpVerified = (Boolean) session.getAttribute("otpVerified");
-
-        if (otpVerified == null || !otpVerified) {
-            session.setAttribute("error", "Please verify OTP first.");
-            response.sendRedirect(request.getContextPath() + "/signin");
-        }
 
         try {
             String password = request.getParameter("newPassword");
@@ -101,13 +95,13 @@ public class ResetPasswordController extends HttpServlet {
             UserDao userDao = new UserDao();
             userDao.changePassword(user.getUsername(), passwordHash, passwordSalt);
             
-            session.invalidate();
+            session.setAttribute("user", user);
             request.setAttribute("message", "Reset your password successfully!");
-            request.getRequestDispatcher("/Signin.jsp").forward(request, response);
+            request.getRequestDispatcher("../Homepage.jsp").forward(request, response);
         } catch (IOException ex) {
             Logger.getLogger(ResetPasswordController.class.getName()).log(Level.SEVERE, null, ex);
             request.setAttribute("error", "Something went wrong while reset your account. Please try again.");
-            request.getRequestDispatcher("/Signin.jsp").forward(request, response);
+            request.getRequestDispatcher("../Signin.jsp").forward(request, response);
         }
     }
 

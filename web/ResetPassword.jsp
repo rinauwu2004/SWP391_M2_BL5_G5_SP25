@@ -441,7 +441,7 @@
                     <section class="section">
                         <header class="box">
                             <div class="box-2"></div>
-                            <h1 class="text">Reset Password</h1>
+                            <h1 class="text">Change New Password</h1>
                             <p class="text-2">Enter your new password below</p>
                         </header>
 
