@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.naming.NamingException;
 import vn.edu.fpt.dao.UserDao;
 import vn.edu.fpt.model.GoogleAccount;
 import vn.edu.fpt.model.User;
@@ -54,7 +55,7 @@ public class GoogleSigninController extends HttpServlet {
             request.getSession().setAttribute("user", user);
             response.sendRedirect(request.getContextPath() + "/home");
 
-        } catch (IOException ex) {
+        } catch (IOException | NamingException ex) {
             Logger.getLogger(GoogleSigninController.class.getName()).log(Level.SEVERE, null, ex);
             request.setAttribute("error", "Login with Google failed.");
             request.getRequestDispatcher("/Signin.jsp").forward(request, response);

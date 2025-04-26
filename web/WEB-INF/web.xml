@@ -8,6 +8,18 @@
         <servlet-name>CompleteProfileController</servlet-name>
         <servlet-class>vn.edu.fpt.controller.CompleteProfileController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ForgotPasswordController</servlet-name>
+        <servlet-class>vn.edu.fpt.controller.ForgotPasswordController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AccountCreationController</servlet-name>
+        <servlet-class>vn.edu.fpt.controller.AccountCreationController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ResetPasswordController</servlet-name>
+        <servlet-class>vn.edu.fpt.controller.ResetPasswordController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>SignoutController</servlet-name>
         <url-pattern>/signout</url-pattern>
@@ -19,6 +31,18 @@
     <servlet-mapping>
         <servlet-name>CompleteProfileController</servlet-name>
         <url-pattern>/complete-profile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ForgotPasswordController</servlet-name>
+        <url-pattern>/forgot-password</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AccountCreationController</servlet-name>
+        <url-pattern>/user/create</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ResetPasswordController</servlet-name>
+        <url-pattern>/user/forgot-password</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>home</welcome-file>

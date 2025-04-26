@@ -135,6 +135,9 @@ public class SignupController extends HttpServlet {
         session.setAttribute("phoneNumber", phoneNumber);
         session.setAttribute("email", emailAddress);
         session.setAttribute("address", address);
+        
+        String otpPurpose = "signin";
+        session.setAttribute("otpPurpose", otpPurpose);
 
         String otp = JavaMail.createOTP();
         JavaMail.sendOTP(emailAddress, otp);

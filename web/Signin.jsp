@@ -265,7 +265,7 @@
                         <input type="checkbox" id="remember" name="remember" ${savedUsername != null ? "checked" : ""} class="remember-checkbox" />
                         <label for="remember" class="remember-label">Remember me</label>
                     </div>
-                    <a href="#" class="forgot-password">Forgot your password?</a>
+                    <a href="forgot-password" class="forgot-password">Forgot your password?</a>
                 </div>
 
                 <button type="submit" class="signin-button">Sign in</button>
@@ -275,7 +275,7 @@
                 <span class="divider-text">Or continue with</span>
             </div>
 
-            <button type="button" class="google-button">
+            <button type="button" class="google-button" onclick="document.getElementById('google-login-link').click();">
                 <div class="button-icon">
                     <svg width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg" class="google-icon">
                     <g clip-path="url(#clip0_146_54)">
@@ -289,7 +289,7 @@
                     </svg>
                 </div>
                 <div class="button-link">
-                    <a href="${googleLoginURL}">
+                    <a href="${googleLoginURL}" id="google-login-link">
                         Sign in with Google
                     </a>
                 </div>

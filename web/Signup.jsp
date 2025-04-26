@@ -189,6 +189,10 @@
                 <c:remove var="error" scope="session"/>
             </c:if>
 
+            <c:if test="${not empty requestScope.error}">
+                <p style="margin-top: 5px; color:red; text-align: center; font-size: 14px;">${requestScope.error}</p>
+            </c:if>
+
             <form action="<%=request.getContextPath()%>/signup" method="post">
                 <div class="form-row">
                     <div class="form-group">

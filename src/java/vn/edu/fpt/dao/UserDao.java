@@ -64,13 +64,30 @@ public class UserDao extends DBContext {
                 user.setDob(Date.valueOf(rs.getString("date_of_birth")));
                 user.setCountry(countryDao.get(rs.getInt("country_id")));
                 user.setPhoneNumber(rs.getString("phone_number"));
-                user.setEmailAddress(rs.getString("email_aDddress"));
+                user.setEmailAddress(rs.getString("email_address"));
                 user.setAddress(rs.getString("address"));
             }
         } catch (SQLException ex) {
             Logger.getLogger(UserDao.class.getName()).log(Level.SEVERE, null, ex);
         }
         return user;
+    }
+    
+    public void changePassword(String input, String hashPassword, String saltPassword) {
+        String sql = """
+                     UPDATE [dbo].[User]
+                        SET [password_hash] = ?
+                           ,[password_salt] = ?
+                     WHERE [email_address] = ? OR [username] = ? 
+                     """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setString(1, hashPassword);
+            stm.setString(2, saltPassword);
+            stm.setString(3, input);
+            stm.setString(4, input);
+        } catch (SQLException ex) {
+            Logger.getLogger(UserDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public boolean isUsernameTaken(String username) {

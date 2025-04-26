@@ -11,13 +11,19 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import vn.edu.fpt.util.JavaMail;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import vn.edu.fpt.dao.UserDao;
+import vn.edu.fpt.model.User;
+import static vn.edu.fpt.util.PasswordEncryption.encodePassword;
+import static vn.edu.fpt.util.PasswordEncryption.generateSalt;
+import static vn.edu.fpt.util.PasswordEncryption.passwordEncyption;
 
 /**
  *
  * @author Rinaaaa
  */
-public class ResendOTPController extends HttpServlet {
+public class ResetPasswordController extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -36,10 +42,10 @@ public class ResendOTPController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ResendOTPController</title>");
+            out.println("<title>Servlet ResetPasswordController</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet ResendOTPController at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet ResetPasswordController at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -57,23 +63,7 @@ public class ResendOTPController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        String page = request.getParameter("page");
-        String email = (String) session.getAttribute("email");
-
-        if (email == null || email.isEmpty()) {
-            request.getRequestDispatcher(page).forward(request, response);
-            return;
-        }
-
-        String otp = JavaMail.createOTP();
-        JavaMail.sendOTP(email, otp);
-        session.setAttribute("otp", otp);
-        int timeoutMinutes = 5;
-        session.setAttribute("timeout", timeoutMinutes);
-        long expiryTimeMillis = System.currentTimeMillis() + (timeoutMinutes * 60 * 1000);
-        session.setAttribute("otpExpiryTime", expiryTimeMillis);
-        request.getRequestDispatcher(page).forward(request, response);
+        request.getRequestDispatcher("../ResetPassword.jsp").forward(request, response);
     }
 
     /**
@@ -87,6 +77,38 @@ public class ResendOTPController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Boolean otpVerified = (Boolean) session.getAttribute("otpVerified");
+
+        if (otpVerified == null || !otpVerified) {
+            session.setAttribute("error", "Please verify OTP first.");
+            response.sendRedirect(request.getContextPath() + "/signin");
+        }
+
+        try {
+            String password = request.getParameter("newPassword");
+            User user = (User) session.getAttribute("user");
+
+            byte[] salt = generateSalt();
+            String passwordSalt = encodePassword(salt);
+            String passwordHash = null;
+            try {
+                passwordHash = passwordEncyption(password, salt);
+            } catch (Exception ex) {
+                Logger.getLogger(ResetPasswordController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            UserDao userDao = new UserDao();
+            userDao.changePassword(user.getUsername(), passwordHash, passwordSalt);
+            
+            session.invalidate();
+            request.setAttribute("message", "Reset your password successfully!");
+            request.getRequestDispatcher("/Signin.jsp").forward(request, response);
+        } catch (IOException ex) {
+            Logger.getLogger(ResetPasswordController.class.getName()).log(Level.SEVERE, null, ex);
+            request.setAttribute("error", "Something went wrong while reset your account. Please try again.");
+            request.getRequestDispatcher("/Signin.jsp").forward(request, response);
+        }
     }
 
     /**
