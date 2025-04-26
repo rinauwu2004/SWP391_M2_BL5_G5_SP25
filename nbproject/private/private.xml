@@ -3,8 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/FPT/FULearning/Spring25/SWP391/SWP391_M2_BL5_G5_SP25/web/Homepage.jsp</file>
-            <file>file:/E:/FPT/FULearning/Spring25/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/controller/HomepageController.java</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/controller/SignoutController.java</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/dao/DBContext.java</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/controller/SigninController.java</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/controller/SignupController.java</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/dao/UserDAO.java</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/controller/OTPVerificationController.java</file>
         </group>
     </open-files>
 </project-private>

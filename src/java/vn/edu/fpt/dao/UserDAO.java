@@ -570,4 +570,198 @@ public class UserDAO extends DBContext {
         }
         return statuses;
     }
+
+    // --- Dashboard Statistics ---
+    /**
+     * Đếm số lượng sinh viên (role là Student)
+     */
+    public int getTotalStudents() {
+        String sql = "SELECT COUNT(DISTINCT u.id) FROM [User] u JOIN [UserRole] ur ON u.id = ur.user_id JOIN [Role] r ON ur.role_id = r.id WHERE r.name = 'Student'";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            System.out.println("Error getTotalStudents: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    /**
+     * Đếm số lượt làm bài (QuizResult)
+     */
+    public int getTotalQuizAttempts() {
+        String sql = "SELECT COUNT(*) FROM [QuizResult]";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            System.out.println("Error getTotalQuizAttempts: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    /**
+     * Đếm số lượng quiz
+     */
+    public int getTotalQuizzes() {
+        String sql = "SELECT COUNT(*) FROM [Quiz]";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            System.out.println("Error getTotalQuizzes: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    /**
+     * Đếm số lượng môn học (Subject)
+     */
+    public int getTotalSubjects() {
+        String sql = "SELECT COUNT(*) FROM [Subject]";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            System.out.println("Error getTotalSubjects: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    /**
+     * Đếm tổng số câu hỏi
+     */
+    public int getTotalQuestions() {
+        String sql = "SELECT COUNT(*) FROM [Question]";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            System.out.println("Error getTotalQuestions: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    /**
+     * Lấy điểm trung bình của từng quiz
+     * @return List<Object[]>: [quiz_title, avg_score]
+     */
+    public List<Object[]> getAverageScorePerQuiz() {
+        List<Object[]> result = new ArrayList<>();
+        String sql = "SELECT q.tilte, AVG(qr.score) as avg_score FROM [Quiz] q LEFT JOIN [QuizResult] qr ON q.id = qr.quiz_id GROUP BY q.tilte";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                result.add(new Object[]{rs.getString("tilte"), rs.getDouble("avg_score")});
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getAverageScorePerQuiz: " + e.getMessage());
+        }
+        return result;
+    }
+
+    /**
+     * Thống kê kết quả theo môn học (Subject)
+     * @return List<Object[]>: [subject_name, avg_score, total_attempts]
+     */
+    public List<Object[]> getResultStatsBySubject() {
+        List<Object[]> result = new ArrayList<>();
+        String sql = "SELECT s.name, AVG(qr.score) as avg_score, COUNT(qr.id) as total_attempts " +
+                "FROM [Subject] s " +
+                "LEFT JOIN [Quiz] q ON s.id = q.subject_id " +
+                "LEFT JOIN [QuizResult] qr ON q.id = qr.quiz_id " +
+                "GROUP BY s.name";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                result.add(new Object[]{rs.getString("name"), rs.getDouble("avg_score"), rs.getInt("total_attempts")});
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getResultStatsBySubject: " + e.getMessage());
+        }
+        return result;
+    }
+
+    /**
+     * Đếm số lượng user theo role
+     * @return List<Object[]>: [role_name, count]
+     */
+    public List<Object[]> getUserCountByRole() {
+        List<Object[]> result = new ArrayList<>();
+        String sql = "SELECT r.name, COUNT(u.id) as total FROM [Role] r LEFT JOIN [UserRole] ur ON r.id = ur.role_id LEFT JOIN [User] u ON ur.user_id = u.id GROUP BY r.name";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                result.add(new Object[]{rs.getString("name"), rs.getInt("total")});
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getUserCountByRole: " + e.getMessage());
+        }
+        return result;
+    }
+
+    /**
+     * Đếm số lượng câu hỏi theo quiz
+     * @return List<Object[]>: [quiz_title, count]
+     */
+    public List<Object[]> getQuestionCountByQuiz() {
+        List<Object[]> result = new ArrayList<>();
+        String sql = "  SELECT q.title, COUNT(qq.question_id) as total FROM [Quiz] q LEFT JOIN [QuizQuestion] qq ON q.id = qq.quiz_id GROUP BY q.title";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                result.add(new Object[]{rs.getString("title"), rs.getInt("total")});
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getQuestionCountByQuiz: " + e.getMessage());
+        }
+        return result;
+    }
+
+    /**
+     * Đếm số quiz theo subject
+     * @return List<Object[]>: [subject_name, quiz_count]
+     */
+    public List<Object[]> getQuizCountBySubject() {
+        List<Object[]> result = new ArrayList<>();
+        String sql = "SELECT s.name, COUNT(q.id) as quiz_count FROM [Subject] s LEFT JOIN [Quiz] q ON s.id = q.subject_id GROUP BY s.name";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                result.add(new Object[]{rs.getString("name"), rs.getInt("quiz_count")});
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getQuizCountBySubject: " + e.getMessage());
+        }
+        return result;
+    }
+
+    /**
+     * Đếm số lượt làm bài theo quiz
+     * @return List<Object[]>: [quiz_title, attempt_count]
+     */
+    public List<Object[]> getAttemptCountByQuiz() {
+        List<Object[]> result = new ArrayList<>();
+        String sql = "SELECT q.title, COUNT(qr.id) as attempt_count FROM [Quiz] q LEFT JOIN [QuizResult] qr ON q.id = qr.quiz_id GROUP BY q.title";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                result.add(new Object[]{rs.getString("title"), rs.getInt("attempt_count")});
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getAttemptCountByQuiz: " + e.getMessage());
+        }
+        return result;
+    }
 }
