@@ -98,7 +98,9 @@
                                     <i class="bi bi-trash text-danger"></i>
                                 </a>
 
-
+                                <a href="viewLesson?id=${s.id}" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-journal-bookmark-fill"></i> View Lesson
+                                </a>
                             </td>
                         </tr>
                     </c:forEach>
