@@ -1,6 +1,6 @@
 USE [SWP391_M2_BL5]
 GO
-
+-- COUNTRY
 INSERT INTO [Country]([name],[code],[prefix]) VALUES (N'Afghanistan','AF','+93');
 INSERT INTO [Country]([name],[code],[prefix]) VALUES (N'Åland Islands','AX','+358');
 INSERT INTO [Country]([name],[code],[prefix]) VALUES (N'Albania','AL','+355');
@@ -250,3 +250,31 @@ INSERT INTO [Country]([name],[code],[prefix]) VALUES (N'Western Sahara','EH','+2
 INSERT INTO [Country]([name],[code],[prefix]) VALUES (N'Yemen','YE','+967');
 INSERT INTO [Country]([name],[code],[prefix]) VALUES (N'Zambia','ZM','+260');
 INSERT INTO [Country]([name],[code],[prefix]) VALUES (N'Zimbabwe','ZW','+263');
+
+--Subject
+GO
+SET IDENTITY_INSERT [dbo].[Subject] ON 
+INSERT [dbo].[Subject] ([id], [code], [name], [description], [status], [created_at], [modified_at]) VALUES (1, N'MTH101', N'Mathematics', N'Basic Mathematics course', 1, CAST(N'2025-04-26T00:38:58.067' AS DateTime), NULL)
+INSERT [dbo].[Subject] ([id], [code], [name], [description], [status], [created_at], [modified_at]) VALUES (2, N'PHY101', N'Physics', N'Introduction to Physics', 1, CAST(N'2025-04-26T00:38:58.067' AS DateTime), NULL)
+SET IDENTITY_INSERT [dbo].[Subject] OFF
+
+-- Lesson
+GO
+SET IDENTITY_INSERT [dbo].[Lesson] ON 
+INSERT [dbo].[Lesson] ([id], [name], [description], [subject_id], [status], [modified_at], [created_at]) VALUES (1, N'Linear Equationswwsss', N'Solving simple linear equationssssss', 1, 0, CAST(N'2025-04-26T21:34:39.320' AS DateTime), CAST(N'2025-04-26T00:38:58.073' AS DateTime))
+INSERT [dbo].[Lesson] ([id], [name], [description], [subject_id], [status], [modified_at], [created_at]) VALUES (7, N'ddd', N'dd', 2, 1, CAST(N'2025-04-26T21:25:34.777' AS DateTime), CAST(N'2025-04-26T21:25:34.777' AS DateTime))
+INSERT [dbo].[Lesson] ([id], [name], [description], [subject_id], [status], [modified_at], [created_at]) VALUES (8, N'Linear Equationswwsss', N'dddd', 1, 1, CAST(N'2025-04-26T21:30:28.903' AS DateTime), CAST(N'2025-04-26T21:30:28.903' AS DateTime))
+INSERT [dbo].[Lesson] ([id], [name], [description], [subject_id], [status], [modified_at], [created_at]) VALUES (9, N'Linear Equationswwsss', N'ddd', 1, 1, CAST(N'2025-04-26T21:32:57.017' AS DateTime), CAST(N'2025-04-26T21:32:57.017' AS DateTime))
+INSERT [dbo].[Lesson] ([id], [name], [description], [subject_id], [status], [modified_at], [created_at]) VALUES (10, N'ssss', N'ssss', 2, 1, CAST(N'2025-04-26T21:50:03.217' AS DateTime), CAST(N'2025-04-26T21:50:03.217' AS DateTime))
+INSERT [dbo].[Lesson] ([id], [name], [description], [subject_id], [status], [modified_at], [created_at]) VALUES (11, N'sss', N'dffff', 2, 0, CAST(N'2025-04-26T21:50:07.913' AS DateTime), CAST(N'2025-04-26T21:50:07.913' AS DateTime))
+INSERT [dbo].[Lesson] ([id], [name], [description], [subject_id], [status], [modified_at], [created_at]) VALUES (12, N'Linear Equationswwsss', N'sss', 2, 0, CAST(N'2025-04-26T21:50:11.877' AS DateTime), CAST(N'2025-04-26T21:50:11.877' AS DateTime))
+INSERT [dbo].[Lesson] ([id], [name], [description], [subject_id], [status], [modified_at], [created_at]) VALUES (13, N'aa', N'ddd', 2, 1, CAST(N'2025-04-26T21:50:15.820' AS DateTime), CAST(N'2025-04-26T21:50:15.820' AS DateTime))
+INSERT [dbo].[Lesson] ([id], [name], [description], [subject_id], [status], [modified_at], [created_at]) VALUES (14, N'ww', N'www', 2, 0, CAST(N'2025-04-26T21:50:19.610' AS DateTime), CAST(N'2025-04-26T21:50:19.610' AS DateTime))
+SET IDENTITY_INSERT [dbo].[Lesson] OFF
+
+-- Module
+GO
+SET IDENTITY_INSERT [dbo].[Module] ON 
+INSERT [dbo].[Module] ([id], [name], [lesson_id], [description], [url]) VALUES (1, N'Algebra Basics', 1, N'Basic concepts of algebra', N'https://example.com/algebra')
+INSERT [dbo].[Module] ([id], [name], [lesson_id], [description], [url]) VALUES (2, N'Newtonian Mechanics', 1, N'Classical physics module', N'https://example.com/mechanics')
+SET IDENTITY_INSERT [dbo].[Module] OFF
