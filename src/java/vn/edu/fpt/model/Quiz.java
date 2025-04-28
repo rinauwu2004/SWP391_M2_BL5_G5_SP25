@@ -4,7 +4,7 @@
  */
 package vn.edu.fpt.model;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 /**
  *
