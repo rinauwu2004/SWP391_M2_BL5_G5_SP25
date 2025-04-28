@@ -48,7 +48,7 @@ public class GoogleSigninController extends HttpServlet {
                 user.setEmailAddress(email);
 
                 request.getSession().setAttribute("tempUser", user);
-                response.sendRedirect(request.getContextPath() + "/complete-profile");
+                response.sendRedirect(request.getContextPath() + "/signup-role?purpose=complete-profile");
                 return;
             }
 

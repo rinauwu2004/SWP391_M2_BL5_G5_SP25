@@ -4,7 +4,9 @@
  */
 package vn.edu.fpt.util;
 
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,7 +29,7 @@ public class PasswordEncryption {
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
             byte[] hash = factory.generateSecret(spec).getEncoded();
             return encodePassword(hash);
-        } catch (Exception ex) {
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
             Logger.getLogger(PasswordEncryption.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }

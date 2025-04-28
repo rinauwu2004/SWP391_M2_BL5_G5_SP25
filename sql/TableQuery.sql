@@ -8,14 +8,22 @@ CREATE TABLE [Country] (
 	[code] VARCHAR(10) NOT NULL,
 	[prefix] VARCHAR(10) NOT NULL,
 
-	CONSTRAINT PK_Country PRIMARY KEY ([id])
+	CONSTRAINT [PK_Country] PRIMARY KEY ([id])
 );
 
 CREATE TABLE [UserStatus] (
 	[id] int IDENTITY(1,1),
 	[name] varchar(50) NOT NULL,
 
-	CONSTRAINT PK_UserStatus PRIMARY KEY ([id])
+	CONSTRAINT [PK_UserStatus] PRIMARY KEY ([id])
+)
+
+CREATE TABLE [Role] (
+	[id] int IDENTITY(1,1),
+	[name] varchar(50) NOT NULL,
+	[description] text NOT NULL,
+
+	CONSTRAINT [PK_Role] PRIMARY KEY ([id]),
 )
 
 CREATE TABLE [User] (
@@ -31,29 +39,13 @@ CREATE TABLE [User] (
 	[email_address] varchar(255) UNIQUE NOT NULL,
 	[address] text NOT NULL,
 	[status_id] int DEFAULT(1),
+	[role_id] int NOT NULL,
 	[created_at] datetime DEFAULT(GETDATE()),
 
-	CONSTRAINT PK_User PRIMARY KEY ([id]),
-	CONSTRAINT FK_User_UserStatus FOREIGN KEY ([status_id]) REFERENCES [UserStatus]([id]) ON UPDATE CASCADE,
-	CONSTRAINT FK_User_Country FOREIGN KEY ([country_id]) REFERENCES [Country]([id])
-)
-
-CREATE TABLE [Role] (
-	[id] int IDENTITY(1,1),
-	[name] varchar(50) NOT NULL,
-	[description] text,
-
-	CONSTRAINT PK_Role PRIMARY KEY ([id]),
-)
-
-CREATE TABLE [UserRole] (
-	[id] int IDENTITY(1,1),
-	[user_id] int NOT NULL,
-	[role_id] int NOT NULL,
-
-	CONSTRAINT PK_UserRole PRIMARY KEY ([id]),
-	CONSTRAINT FK_UserRole_User FOREIGN KEY ([user_id]) REFERENCES [User]([id]) ON UPDATE CASCADE,
-	CONSTRAINT FK_UserRole_Role FOREIGN KEY ([role_id]) REFERENCES [Role]([id]) ON UPDATE CASCADE
+	CONSTRAINT [PK_User] PRIMARY KEY ([id]),
+	CONSTRAINT [FK_User_UserStatus] FOREIGN KEY ([status_id]) REFERENCES [UserStatus]([id]) ON UPDATE CASCADE,
+	CONSTRAINT [FK_User_Role] FOREIGN KEY ([role_id]) REFERENCES [Role]([id]),
+	CONSTRAINT [FK_User_Country] FOREIGN KEY ([country_id]) REFERENCES [Country]([id])
 )
 
 CREATE TABLE [Subject] (
@@ -65,62 +57,63 @@ CREATE TABLE [Subject] (
 	[created_at] datetime DEFAULT(GETDATE()),
 	[modified_at] datetime,
 
-	CONSTRAINT PK_Subject PRIMARY KEY ([id]),
+	CONSTRAINT [PK_Subject] PRIMARY KEY ([id])
 )
 
 CREATE TABLE [Quiz] (
-	[id] int IDENTITY(1,1),
-	[title] varchar(255) NOT NULL,
-	[subject_id] int NOT NULL,
-	[description] text,
-	[duration] int NOT NULL,
-	[is_started] bit DEFAULT(0),
+  [id] int IDENTITY(1,1),
+  [teacherId] int NOT NULL,
+  [title] nvarchar(255) NOT NULL,
+  [description] nvarchar(max),
+  [code] varchar(20) UNIQUE,
+  [timeLimit] int,
+  [status] varchar(20) DEFAULT 'Not started',
+  [createdAt] DATETIME DEFAULT GETDATE(),
 
-	CONSTRAINT PK_Quiz PRIMARY KEY ([id]),
-	CONSTRAINT FK_Quiz_Subject FOREIGN KEY ([subject_id]) REFERENCES [Subject]([id]) ON UPDATE CASCADE,
-)
+  CONSTRAINT [PK_Quiz] PRIMARY KEY ([id]),
+  CONSTRAINT [FK_Quiz_User] FOREIGN KEY ([teacherId]) REFERENCES [User]([id])
+);
 
 CREATE TABLE [Question] (
-	[id] int IDENTITY(1,1),
-	[description] text NOT NULL,
-	[option] text NOT NULL,
-	[correct_answer] text NOT NULL,
+  [id] int IDENTITY(1,1),
+  [quizId] int NOT NULL,
+  [content] NVARCHAR(MAX) NOT NULL,
+  
+  CONSTRAINT [PK_Question] PRIMARY KEY ([id]),
+  CONSTRAINT [FK_Question_Quiz] FOREIGN KEY ([quizId]) REFERENCES [Quiz]([id])
+);
 
-	CONSTRAINT PK_Question PRIMARY KEY ([id]),
-)
+CREATE TABLE [Answer] (
+  [id] int IDENTITY(1,1),
+  [questionId] int NOT NULL,
+  [content] NVARCHAR(MAX) NOT NULL,
+  [isCorrect] BIT DEFAULT 0,
 
-CREATE TABLE [QuizQuestion] (
-	[id] int IDENTITY(1,1),
-	[quiz_id] int NOT NULL,
-	[question_id] int NOT NULL,
+  CONSTRAINT [PK_Answer] PRIMARY KEY ([id]),
+  CONSTRAINT [FK_Answer_Question] FOREIGN KEY ([questionId]) REFERENCES [Question]([id])
+);
 
-	CONSTRAINT PK_QuizQuestion PRIMARY KEY ([id]),
-	CONSTRAINT FK_QuizQuestion_Quiz FOREIGN KEY ([quiz_id]) REFERENCES [Quiz]([id]) ON UPDATE CASCADE,
-	CONSTRAINT FK_QuizQuestion_Question FOREIGN KEY ([question_id]) REFERENCES [Question]([id]) ON UPDATE CASCADE,
-)
+CREATE TABLE [QuizAttempt] (
+  [id] int IDENTITY(1,1),
+  [studentId] int NOT NULL,
+  [quizId] int NOT NULL,
+  [startedTime] DATETIME DEFAULT GETDATE(),
+  [submittedTime] DATETIME,
+  [score] FLOAT,
 
-CREATE TABLE [UserAnswer] (
-	[id] int IDENTITY(1,1),
-	[user_id] int NOT NULL,
-	[quiz_id] int NOT NULL,
-	[question_id] int NOT NULL,
-	[selected_answer] text NOT NULL,
-	[is_correct] bit NOT NULL,
+  CONSTRAINT [PK_QuizAttempt] PRIMARY KEY ([id]),
+  CONSTRAINT [FK_QuizAttempt_Quiz] FOREIGN KEY ([quizId]) REFERENCES [Quiz]([id]),
+  CONSTRAINT [FK_QuizAttempt_User] FOREIGN KEY ([studentId]) REFERENCES [User]([id])
+);
 
-	CONSTRAINT PK_UserAnswer PRIMARY KEY ([id]),
-	CONSTRAINT FK_UserAnswer_User FOREIGN KEY ([user_id]) REFERENCES [User]([id]) ON UPDATE CASCADE,
-	CONSTRAINT FK_UserAnswer_Quiz FOREIGN KEY ([quiz_id]) REFERENCES [Quiz]([id]) ON UPDATE CASCADE,
-	CONSTRAINT FK_UserAnswer_Question FOREIGN KEY ([question_id]) REFERENCES [Question]([id]) ON UPDATE CASCADE
-)
-
-CREATE TABLE [QuizResult] (
-	[id] int IDENTITY(1,1),
-	[user_id] int NOT NULL,
-	[quiz_id] int NOT NULL,
-	[score] decimal(10,2) NOT NULL,
-	[submitted_time] datetime NOT NULL,
-
-	CONSTRAINT PK_QuizResult PRIMARY KEY ([id]),
-	CONSTRAINT FK_QuizResult_User FOREIGN KEY ([user_id]) REFERENCES [User]([id]) ON UPDATE CASCADE,
-	CONSTRAINT FK_QuizResult_Quiz FOREIGN KEY ([quiz_id]) REFERENCES [Quiz]([id]) ON UPDATE CASCADE
-)
+CREATE TABLE [QuizAttemptDetail] (
+  [id] INT IDENTITY(1,1),
+  [attemptId] INT NOT NULL,
+  [questionId] INT NOT NULL,
+  [answerId] INT NOT NULL,
+  
+  CONSTRAINT [PK_QuizAttemptDetail] PRIMARY KEY ([id]),
+  CONSTRAINT [FK_QuizAttemptDetail_QuizAttempt] FOREIGN KEY ([attemptId]) REFERENCES [QuizAttempt]([id]),
+  CONSTRAINT [FK_QuizAttemptDetail_Question] FOREIGN KEY ([questionId]) REFERENCES [Question]([id]),
+  CONSTRAINT [FK_QuizAttemptDetail_Answer] FOREIGN KEY ([answerId]) REFERENCES [Answer]([id])
+);

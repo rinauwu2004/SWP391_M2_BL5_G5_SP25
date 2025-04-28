@@ -176,6 +176,7 @@
             </p>
 
             <form action="<%=request.getContextPath()%>/complete-profile" method="post">
+                <input type="hidden" id="role" name="role" value="${param.role}">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="firstName">First Name</label>

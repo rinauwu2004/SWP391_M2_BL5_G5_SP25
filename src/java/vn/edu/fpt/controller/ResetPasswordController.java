@@ -15,8 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import vn.edu.fpt.dao.UserDao;
 import vn.edu.fpt.model.User;
-import static vn.edu.fpt.util.PasswordEncryption.encodePassword;
-import static vn.edu.fpt.util.PasswordEncryption.generateSalt;
+import static vn.edu.fpt.util.PasswordEncryption.decodePassword;
 import static vn.edu.fpt.util.PasswordEncryption.passwordEncyption;
 
 /**
@@ -82,9 +81,9 @@ public class ResetPasswordController extends HttpServlet {
         try {
             String password = request.getParameter("newPassword");
             User user = (User) session.getAttribute("user");
-
-            byte[] salt = generateSalt();
-            String passwordSalt = encodePassword(salt);
+            
+            String passwordSalt = user.getSaltPassword();
+            byte[] salt = decodePassword(passwordSalt);
             String passwordHash = null;
             try {
                 passwordHash = passwordEncyption(password, salt);
@@ -93,7 +92,7 @@ public class ResetPasswordController extends HttpServlet {
             }
             
             UserDao userDao = new UserDao();
-            userDao.changePassword(user.getUsername(), passwordHash, passwordSalt);
+            userDao.changePassword(user.getUsername(), passwordHash);
             
             session.setAttribute("user", user);
             request.setAttribute("message", "Reset your password successfully!");

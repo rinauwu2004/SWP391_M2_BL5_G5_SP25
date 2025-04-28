@@ -17,8 +17,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vn.edu.fpt.dao.CountryDao;
+import vn.edu.fpt.dao.RoleDao;
 import vn.edu.fpt.dao.UserDao;
 import vn.edu.fpt.model.Country;
+import vn.edu.fpt.model.Role;
 import static vn.edu.fpt.util.Json.sendJson;
 import static vn.edu.fpt.util.PasswordEncryption.encodePassword;
 import static vn.edu.fpt.util.PasswordEncryption.generateSalt;
@@ -114,6 +116,7 @@ public class CompleteProfileController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         CountryDao countryDao = new CountryDao();
+        RoleDao roleDao = new RoleDao();
         HttpSession session = request.getSession();
         User tempUser = (User) session.getAttribute("tempUser");
 
@@ -122,6 +125,7 @@ public class CompleteProfileController extends HttpServlet {
             return;
         }
 
+        Role role = roleDao.get(request.getParameter("role"));
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String passwordHash = "";
@@ -139,6 +143,7 @@ public class CompleteProfileController extends HttpServlet {
             Logger.getLogger(SignupController.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+        tempUser.setRole(role);
         tempUser.setUsername(username);
         tempUser.setHashPassword(passwordHash);
         tempUser.setSaltPassword(passwordSalt);

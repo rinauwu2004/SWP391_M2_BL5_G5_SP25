@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import vn.edu.fpt.dao.UserDao;
 import vn.edu.fpt.model.Country;
+import vn.edu.fpt.model.Role;
 import vn.edu.fpt.model.User;
 
 /**
@@ -47,6 +48,7 @@ public class AccountCreationController extends HttpServlet {
         }
 
         try {
+            Role role = (Role) session.getAttribute("role");
             String username = (String) session.getAttribute("username");
             String passwordHash = (String) session.getAttribute("passwordHash");
             String passwordSalt = (String) session.getAttribute("passwordSalt");
@@ -61,7 +63,7 @@ public class AccountCreationController extends HttpServlet {
             if (username == null || passwordHash == null || passwordSalt == null
                     || firstName == null || lastName == null || dob == null
                     || country == null || phoneNumber == null || emailAddress == null
-                    || address == null) {
+                    || address == null || role == null) {
                 request.setAttribute("error", "Missing user data. Try again!!!");
                 request.getRequestDispatcher("/Signup.jsp").forward(request, response);
                 return;
@@ -78,6 +80,7 @@ public class AccountCreationController extends HttpServlet {
             user.setPhoneNumber(phoneNumber);
             user.setEmailAddress(emailAddress);
             user.setAddress(address);
+            user.setRole(role);
 
             UserDao userDao = new UserDao();
             userDao.addUser(user);

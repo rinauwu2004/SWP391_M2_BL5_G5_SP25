@@ -28,7 +28,6 @@ public class OTPVerificationController extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         String otpPurpose = (String) session.getAttribute("otpPurpose");
-
         String otp = request.getParameter("otp");
         String otpStore = (String) session.getAttribute("otp");
 

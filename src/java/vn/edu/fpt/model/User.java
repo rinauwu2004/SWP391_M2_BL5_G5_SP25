@@ -24,6 +24,7 @@ public class User {
     private String emailAddress;
     private String address;
     private UserStatus status;
+    private Role role;
     private Timestamp createdAt;
     
     public User() {}
@@ -130,5 +131,13 @@ public class User {
 
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 }

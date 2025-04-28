@@ -296,7 +296,7 @@
             </button>
 
             <div class="signup-link">
-                Don't have an account? <a href="signup">Sign up</a>
+                Don't have an account? <a href="<%=request.getContextPath()%>/signup-role?purpose=signup">Sign up</a>
             </div>
 
             <c:if test="${not empty error}">

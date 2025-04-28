@@ -15,8 +15,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vn.edu.fpt.dao.CountryDao;
+import vn.edu.fpt.dao.RoleDao;
 import vn.edu.fpt.dao.UserDao;
 import vn.edu.fpt.model.Country;
+import vn.edu.fpt.model.Role;
 import vn.edu.fpt.util.JavaMail;
 import static vn.edu.fpt.util.PasswordEncryption.encodePassword;
 import static vn.edu.fpt.util.PasswordEncryption.generateSalt;
@@ -90,7 +92,6 @@ public class SignupController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
         HttpSession session = request.getSession();
         Long lockTime = (Long) session.getAttribute("lockTime");
         long currentTime = System.currentTimeMillis();
@@ -101,9 +102,11 @@ public class SignupController extends HttpServlet {
             return;
         }
 
+        RoleDao roleDao = new RoleDao();
         CountryDao countryDao = new CountryDao();
-
+        
         // Get data from form
+        Role role = roleDao.get(request.getParameter("role"));
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String passwordHash = "";
@@ -125,6 +128,7 @@ public class SignupController extends HttpServlet {
             Logger.getLogger(SignupController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        session.setAttribute("role", role);
         session.setAttribute("username", username);
         session.setAttribute("passwordHash", passwordHash);
         session.setAttribute("passwordSalt", passwordSalt);
@@ -136,7 +140,7 @@ public class SignupController extends HttpServlet {
         session.setAttribute("email", emailAddress);
         session.setAttribute("address", address);
         
-        String otpPurpose = "signin";
+        String otpPurpose = "signup";
         session.setAttribute("otpPurpose", otpPurpose);
 
         String otp = JavaMail.createOTP();

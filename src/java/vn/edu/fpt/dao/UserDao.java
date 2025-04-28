@@ -4,7 +4,6 @@
  */
 package vn.edu.fpt.dao;
 
-import com.oracle.wls.shaded.org.apache.bcel.generic.AALOAD;
 import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,8 +20,8 @@ public class UserDao extends DBContext {
                      INSERT INTO [dbo].[User](
                         [username], [password_hash], [password_salt],
                      	[first_name], [last_name], [date_of_birth],
-                        [country_id], [phone_number], [email_address], [address])
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        [country_id], [phone_number], [email_address], [address], [role_id])
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                      """;
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setString(1, user.getUsername());
@@ -35,6 +34,7 @@ public class UserDao extends DBContext {
             stm.setString(8, user.getPhoneNumber());
             stm.setString(9, user.getEmailAddress());
             stm.setString(10, user.getAddress());
+            stm.setInt(11,user.getRole().getId());
             stm.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(UserDao.class.getName()).log(Level.SEVERE, null, ex);
@@ -43,13 +43,14 @@ public class UserDao extends DBContext {
 
     public User getUser(String input) {
         CountryDao countryDao = new CountryDao();
+        RoleDao roleDao = new RoleDao();
         UserStatusDao userStatusDao = new UserStatusDao();
         User user = null;
         String sql = """
                  SELECT [id], [username], [password_hash], [password_salt], 
                         [first_name], [last_name], [date_of_birth], 
                         [country_id], [phone_number], [email_address], [address],
-                        [status_id], [created_at]
+                        [status_id], [role_id], [created_at]
                  FROM [User] WHERE [username] = ? OR [email_address] = ?
                  """;
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
@@ -70,6 +71,7 @@ public class UserDao extends DBContext {
                 user.setEmailAddress(rs.getString("email_address"));
                 user.setAddress(rs.getString("address"));
                 user.setStatus(userStatusDao.get(rs.getInt("status_id")));
+                user.setRole(roleDao.get(rs.getInt("role_id")));
                 user.setCreatedAt(rs.getTimestamp("created_at"));
             }
         } catch (SQLException ex) {
@@ -78,18 +80,17 @@ public class UserDao extends DBContext {
         return user;
     }
     
-    public void changePassword(String input, String hashPassword, String saltPassword) {
+    public void changePassword(String input, String hashPassword) {
         String sql = """
                      UPDATE [dbo].[User]
                         SET [password_hash] = ?
-                           ,[password_salt] = ?
                      WHERE [email_address] = ? OR [username] = ? 
                      """;
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setString(1, hashPassword);
-            stm.setString(2, saltPassword);
+            stm.setString(2, input);
             stm.setString(3, input);
-            stm.setString(4, input);
+            stm.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(UserDao.class.getName()).log(Level.SEVERE, null, ex);
         }

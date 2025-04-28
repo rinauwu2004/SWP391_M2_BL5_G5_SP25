@@ -45,7 +45,7 @@
                             </c:when>
                             <c:otherwise>
                                 <a href="<%=request.getContextPath()%>/signin" class="btn btn-outline">Sign In</a>
-                                <a href="<%=request.getContextPath()%>/signup" class="btn btn-primary">Sign Up</a>
+                                <a href="<%=request.getContextPath()%>/signup-role?purpose=signup" class="btn btn-primary">Sign Up</a>
                             </c:otherwise>
                         </c:choose>
                     </div>
