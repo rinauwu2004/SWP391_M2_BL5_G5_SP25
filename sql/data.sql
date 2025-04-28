@@ -278,3 +278,8 @@ SET IDENTITY_INSERT [dbo].[Module] ON
 INSERT [dbo].[Module] ([id], [name], [lesson_id], [description], [url]) VALUES (1, N'Algebra Basics', 1, N'Basic concepts of algebra', N'https://example.com/algebra')
 INSERT [dbo].[Module] ([id], [name], [lesson_id], [description], [url]) VALUES (2, N'Newtonian Mechanics', 1, N'Classical physics module', N'https://example.com/mechanics')
 SET IDENTITY_INSERT [dbo].[Module] OFF
+
+--Role
+INSERT INTO [Role]([name], [description]) VALUES ('System Admin', 'System Admin')
+INSERT INTO [Role]([name], [description]) VALUES ('Student', 'Student')
+INSERT INTO [Role]([name], [description]) VALUES ('Teacher', 'Teacher')
