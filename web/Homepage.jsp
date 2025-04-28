@@ -29,7 +29,7 @@
                     </div>
                     <nav>
                         <ul>
-                            <li><a href="Homepage.jsp">Home</a></li>
+                            <li><a href="<%=request.getContextPath()%>/home">Home</a></li>
                             <li><a href="quizzes.jsp">Quizzes</a></li>
                             <li><a href="categories.jsp">Categories</a></li>
                             <li><a href="about.jsp">About</a></li>
@@ -52,9 +52,16 @@
                 </div>
             </div>
         </header>
-        <c:if test="${not empty message}">
-            <p style="margin-top: 10px; margin-bottom: 10px; color:green; text-align: center; font-size: 16px;">${message}</p>
+
+        <c:if test="${not empty requestScope.message}">
+            <p style="margin-top: 10px; margin-bottom: 10px; color:green; text-align: center; font-size: 16px;">${requestScope.message}</p>
         </c:if>
+
+        <c:if test="${not empty sessionScope.message}">
+            <p style="margin-top: 10px; margin-bottom: 10px; color:green; text-align: center; font-size: 16px;">${sessionScope.message}</p>
+            <c:set var="sessionScope.message" value="${null}" scope="session" />
+        </c:if>
+
         <!-- Hero Section -->
         <section class="hero">
             <div class="container">

@@ -13,7 +13,7 @@ CREATE TABLE [Country] (
 
 CREATE TABLE [UserStatus] (
 	[id] int IDENTITY(1,1),
-	[name] varchar(50) NOT NULL,
+	[name] varchar(50) UNIQUE NOT NULL,
 
 	CONSTRAINT [PK_UserStatus] PRIMARY KEY ([id])
 )
