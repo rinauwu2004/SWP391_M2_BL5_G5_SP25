@@ -47,8 +47,8 @@ public class UserDao extends DBContext {
         UserStatusDao userStatusDao = new UserStatusDao();
         User user = null;
         String sql = """
-                 SELECT [id], [username], [password_hash], [password_salt],
-                        [first_name], [last_name], [date_of_birth],
+                 SELECT [id], [username], [password_hash], [password_salt], 
+                        [first_name], [last_name], [date_of_birth], 
                         [country_id], [phone_number], [email_address], [address],
                         [status_id], [role_id], [created_at]
                  FROM [User] WHERE [username] = ? OR [email_address] = ?
@@ -79,12 +79,50 @@ public class UserDao extends DBContext {
         }
         return user;
     }
-
+    
+    public User getUser(int id) {
+        CountryDao countryDao = new CountryDao();
+        RoleDao roleDao = new RoleDao();
+        UserStatusDao userStatusDao = new UserStatusDao();
+        User user = null;
+        String sql = """
+                 SELECT [id], [username], [password_hash], [password_salt], 
+                        [first_name], [last_name], [date_of_birth], 
+                        [country_id], [phone_number], [email_address], [address],
+                        [status_id], [role_id], [created_at]
+                 FROM [User] WHERE [id] = ?
+                 """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, id);
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                user = new User();
+                user.setId(rs.getInt("id"));
+                user.setUsername(rs.getString("username"));
+                user.setHashPassword(rs.getString("password_hash"));
+                user.setSaltPassword(rs.getString("password_salt"));
+                user.setFirstName(rs.getNString("first_name"));
+                user.setLastName(rs.getNString("last_name"));
+                user.setDob(Date.valueOf(rs.getString("date_of_birth")));
+                user.setCountry(countryDao.get(rs.getInt("country_id")));
+                user.setPhoneNumber(rs.getString("phone_number"));
+                user.setEmailAddress(rs.getString("email_address"));
+                user.setAddress(rs.getString("address"));
+                user.setStatus(userStatusDao.get(rs.getInt("status_id")));
+                user.setRole(roleDao.get(rs.getInt("role_id")));
+                user.setCreatedAt(rs.getTimestamp("created_at"));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return user;
+    }
+    
     public void changePassword(String input, String hashPassword) {
         String sql = """
                      UPDATE [dbo].[User]
                         SET [password_hash] = ?
-                     WHERE [email_address] = ? OR [username] = ?
+                     WHERE [email_address] = ? OR [username] = ? 
                      """;
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setString(1, hashPassword);
@@ -133,43 +171,5 @@ public class UserDao extends DBContext {
             Logger.getLogger(UserDao.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
-    }
-
-    public User getUserById(int userId) {
-        CountryDao countryDao = new CountryDao();
-        RoleDao roleDao = new RoleDao();
-        UserStatusDao userStatusDao = new UserStatusDao();
-        User user = null;
-        String sql = """
-                 SELECT [id], [username], [password_hash], [password_salt],
-                        [first_name], [last_name], [date_of_birth],
-                        [country_id], [phone_number], [email_address], [address],
-                        [status_id], [role_id], [created_at]
-                 FROM [User] WHERE [id] = ?
-                 """;
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, userId);
-            ResultSet rs = stm.executeQuery();
-            if (rs.next()) {
-                user = new User();
-                user.setId(rs.getInt("id"));
-                user.setUsername(rs.getString("username"));
-                user.setHashPassword(rs.getString("password_hash"));
-                user.setSaltPassword(rs.getString("password_salt"));
-                user.setFirstName(rs.getNString("first_name"));
-                user.setLastName(rs.getNString("last_name"));
-                user.setDob(Date.valueOf(rs.getString("date_of_birth")));
-                user.setCountry(countryDao.get(rs.getInt("country_id")));
-                user.setPhoneNumber(rs.getString("phone_number"));
-                user.setEmailAddress(rs.getString("email_address"));
-                user.setAddress(rs.getString("address"));
-                user.setStatus(userStatusDao.get(rs.getInt("status_id")));
-                user.setRole(roleDao.get(rs.getInt("role_id")));
-                user.setCreatedAt(rs.getTimestamp("created_at"));
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(UserDao.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return user;
     }
 }

@@ -283,3 +283,8 @@ SET IDENTITY_INSERT [dbo].[Module] OFF
 INSERT INTO [Role]([name], [description]) VALUES ('System Admin', 'System Admin')
 INSERT INTO [Role]([name], [description]) VALUES ('Student', 'Student')
 INSERT INTO [Role]([name], [description]) VALUES ('Teacher', 'Teacher')
+
+--User Status
+INSERT INTO [UserStatus]([name]) VALUES ('Active')
+INSERT INTO [UserStatus]([name]) VALUES ('Inactive')
+INSERT INTO [UserStatus]([name]) VALUES ('Suspend')

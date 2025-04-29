@@ -4,7 +4,7 @@ GO
 
 CREATE TABLE [Country] (
 	[id] INT IDENTITY(1,1),
-	[name] NVARCHAR(50) NOT NULL,
+	[name] NVARCHAR(50) UNIQUE NOT NULL,
 	[code] VARCHAR(10) NOT NULL,
 	[prefix] VARCHAR(10) NOT NULL,
 
@@ -13,14 +13,14 @@ CREATE TABLE [Country] (
 
 CREATE TABLE [UserStatus] (
 	[id] int IDENTITY(1,1),
-	[name] varchar(50) NOT NULL,
+	[name] varchar(50) UNIQUE NOT NULL,
 
 	CONSTRAINT [PK_UserStatus] PRIMARY KEY ([id])
 )
 
 CREATE TABLE [Role] (
 	[id] int IDENTITY(1,1),
-	[name] varchar(50) NOT NULL,
+	[name] varchar(50) UNIQUE NOT NULL,
 	[description] text NOT NULL,
 
 	CONSTRAINT [PK_Role] PRIMARY KEY ([id]),

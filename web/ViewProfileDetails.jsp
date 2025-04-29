@@ -4,523 +4,226 @@
     Author     : Rinaaaa
 --%>
 
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="utf-8" />
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>User Profile</title>
         <style>
-            @import url("https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css");
             * {
-                -webkit-font-smoothing: antialiased;
+                margin: 0;
+                padding: 0;
                 box-sizing: border-box;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             }
 
-            html,
             body {
-                margin: 0px;
-                height: 100%;
+                background-color: #ffffff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                padding: 1rem;
+            }
+            
+            .back-button {
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background-color: #f3f4f6;
+                border: none;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                transition: all 0.3s ease;
             }
 
-            button:focus-visible {
-                outline: 2px solid #4a90e2 !important;
-                outline: -webkit-focus-ring-color auto 5px !important;
+            .back-button:hover {
+                background-color: #e5e7eb;
+                transform: translateY(-2px);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             }
-            a {
+
+            .back-button:active {
+                transform: translateY(0);
+            }
+
+            .back-arrow {
+                width: 10px;
+                height: 10px;
+                border: solid #4b5563;
+                border-width: 0 2px 2px 0;
+                transform: rotate(135deg);
+                margin: 1px 0px 0px 3px;
+            }
+
+            .profile-container {
+                width: 100%;
+                max-width: 768px;
+                background-color: white;
+                border-radius: 0.5rem;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                border: 1px solid #ced4da;
+            }
+
+            .profile-content {
+                padding: 2rem;
+            }
+
+            .profile-header {
+                text-align: center;
+                margin-bottom: 3rem;
+            }
+
+            .profile-name {
+                font-size: 1.5rem;
+                font-weight: 500;
+                color: #111827;
+            }
+
+            .profile-membership {
+                color: #6b7280;
+                margin-top: 0.25rem;
+            }
+
+            .profile-divider {
+                border-top: 1px solid #ced4da;
+                margin-bottom: 2rem;
+            }
+
+            .profile-details {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            @media (min-width: 768px) {
+                .profile-details {
+                    grid-template-columns: 1fr 1fr;
+                    column-gap: 3rem;
+                    row-gap: 2rem;
+                }
+            }
+
+            .profile-field {
+                margin-bottom: 0.25rem;
+            }
+
+            .field-label {
+                display: block;
+                font-size: 0.875rem;
+                color: #6b7280;
+                margin-bottom: 0.25rem;
+            }
+
+            .field-value {
+                color: #111827;
+            }
+
+            .button-container {
+                margin-top: 3rem;
+            }
+
+            .change-password-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                background-color: #2563eb;
+                padding: 0.5rem 1rem;
+                border-radius: 0.375rem;
+                border: none;
+                cursor: pointer;
+                font-size: 0.875rem;
+                transition: background-color 0.2s;
+            }
+
+            .change-password-btn:hover {
+                background-color: #1d4ed8;
+            }
+            
+            .button-href {
+                color: #ffffff;
+                font-size: 15px;
+                font-weight: bold;
+                text-align: center;
+                line-height: normal;
+                white-space: nowrap;
                 text-decoration: none;
             }
 
-            .view-profile-detail {
-                display: inline-flex;
-                flex-direction: column;
-                align-items: flex-start;
-                position: relative;
-                background-color: #ffffff;
-                border: 2px solid;
-                border-color: #ced4da;
-                width: 100%;
-            }
-
-            .view-profile-detail .body {
-                display: inline-flex;
-                flex-direction: column;
-                align-items: flex-start;
-                position: relative;
-                flex: 0 0 auto;
-                border: 0px none;
-                width: 100%;
-            }
-            
-            .view-profile-detail .div-wrapper {
-                position: relative;
-                width: 768px;
-                height: 610px;
-                top: 32px;
-                left: 336px;
-                border: 0px none;
-            }
-
-            .view-profile-detail .div {
-                position: relative;
-                width: 1440px;
-                height: 1440px;
-                background-color: #f9fafb;
-                border: 0px none;
-                width: 100%;
-            }
-
-            .view-profile-detail .div-2 {
-                position: relative;
-                width: 736px;
-                height: 610px;
-                top: 305px;
-                left: 32px;
-                background-color: #ffffff;
-                border-radius: 12px;
-                border: 0px none;
-                box-shadow: 0px 1px 2px #0000000d;
-            }
-
-            .view-profile-detail .div-3 {
-                position: absolute;
-                width: 672px;
-                height: 129px;
-                top: 32px;
-                left: 32px;
-                border-bottom-width: 1px;
-                border-bottom-style: solid;
-                border-color: #e5e7eb;
-            }
-
-            .view-profile-detail .div-4 {
-                position: relative;
-                width: 181px;
-                height: 56px;
-                top: 20px;
-                left: 120px;
-                border: 0px none;
-            }
-
-            .view-profile-detail .text-wrapper {
-                position: absolute;
-                width: 172px;
-                top: 2px;
-                left: 0;
-                font-family: "Rubik-Regular", Helvetica;
-                font-weight: 400;
-                color: #111827;
-                font-size: 24px;
-                letter-spacing: 0;
-                line-height: 24px;
-                white-space: nowrap;
-            }
-
-            .view-profile-detail .text-wrapper-2 {
-                position: absolute;
-                width: 176px;
-                top: 34px;
-                left: 0;
-                font-family: "Rubik-Regular", Helvetica;
-                font-weight: 400;
-                color: #6b7280;
-                font-size: 16px;
-                letter-spacing: 0;
-                line-height: 16px;
-                white-space: nowrap;
-            }
-
-            .view-profile-detail .div-5 {
-                position: absolute;
-                width: 672px;
-                height: 280px;
-                top: 193px;
-                left: 32px;
-                border: 0px none;
-            }
-
-            .view-profile-detail .div-6 {
-                position: absolute;
-                width: 672px;
-                height: 52px;
-                top: 0;
-                left: 0;
-                border: 0px none;
-            }
-
-            .view-profile-detail .div-7 {
-                position: absolute;
-                width: 324px;
-                height: 52px;
-                top: 0;
-                left: 0;
-                border: 0px none;
-            }
-
-            .view-profile-detail .label {
-                position: absolute;
-                width: 324px;
-                height: 20px;
-                top: 0;
-                left: 0;
-                border: 0px none;
-            }
-
-            .view-profile-detail .text-wrapper-3 {
-                position: absolute;
-                width: 71px;
-                top: 1px;
-                left: 0;
-                font-family: "Rubik-Regular", Helvetica;
-                font-weight: 400;
-                color: #6b7280;
-                font-size: 14px;
-                letter-spacing: 0;
-                line-height: normal;
-            }
-
-            .view-profile-detail .text-wrapper-4 {
-                width: 39px;
-                position: absolute;
-                top: 30px;
-                left: 0;
-                font-family: "Rubik-Regular", Helvetica;
-                font-weight: 400;
-                color: #111827;
-                font-size: 16px;
-                letter-spacing: 0;
-                line-height: 16px;
-                white-space: nowrap;
-            }
-
-            .view-profile-detail .div-8 {
-                position: absolute;
-                width: 324px;
-                height: 52px;
-                top: 0;
-                left: 348px;
-                border: 0px none;
-            }
-
-            .view-profile-detail .text-wrapper-5 {
-                position: absolute;
-                width: 70px;
-                top: 1px;
-                left: 0;
-                font-family: "Rubik-Regular", Helvetica;
-                font-weight: 400;
-                color: #6b7280;
-                font-size: 14px;
-                letter-spacing: 0;
-                line-height: normal;
-            }
-
-            .view-profile-detail .text-wrapper-6 {
-                width: 73px;
-                position: absolute;
-                top: 30px;
-                left: 0;
-                font-family: "Rubik-Regular", Helvetica;
-                font-weight: 400;
-                color: #111827;
-                font-size: 16px;
-                letter-spacing: 0;
-                line-height: 16px;
-                white-space: nowrap;
-            }
-
-            .view-profile-detail .div-9 {
-                position: absolute;
-                width: 672px;
-                height: 52px;
-                top: 76px;
-                left: 0;
-                border: 0px none;
-            }
-
-            .view-profile-detail .label-2 {
-                position: absolute;
-                width: 672px;
-                height: 20px;
-                top: 0;
-                left: 0;
-                border: 0px none;
-            }
-
-            .view-profile-detail .text-wrapper-7 {
-                position: absolute;
-                width: 92px;
-                top: 1px;
-                left: 0;
-                font-family: "Rubik-Regular", Helvetica;
-                font-weight: 400;
-                color: #6b7280;
-                font-size: 14px;
-                letter-spacing: 0;
-                line-height: normal;
-            }
-
-            .view-profile-detail .text-wrapper-8 {
-                position: absolute;
-                width: 220px;
-                top: 30px;
-                left: 0;
-                font-family: "Rubik-Regular", Helvetica;
-                font-weight: 400;
-                color: #111827;
-                font-size: 16px;
-                letter-spacing: 0;
-                line-height: 16px;
-                white-space: nowrap;
-            }
-
-            .view-profile-detail .div-10 {
-                position: absolute;
-                width: 672px;
-                height: 52px;
-                top: 152px;
-                left: 0;
-                border: 0px none;
-            }
-
-            .view-profile-detail .text-wrapper-9 {
-                position: absolute;
-                width: 98px;
-                top: 1px;
-                left: 0;
-                font-family: "Rubik-Regular", Helvetica;
-                font-weight: 400;
-                color: #6b7280;
-                font-size: 14px;
-                letter-spacing: 0;
-                line-height: normal;
-            }
-
-            .view-profile-detail .text-wrapper-10 {
-                position: absolute;
-                width: 134px;
-                top: 30px;
-                left: 0;
-                font-family: "Rubik-Regular", Helvetica;
-                font-weight: 400;
-                color: #111827;
-                font-size: 16px;
-                letter-spacing: 0;
-                line-height: 16px;
-                white-space: nowrap;
-            }
-
-            .view-profile-detail .text-wrapper-11 {
-                position: absolute;
-                width: 83px;
-                top: 1px;
-                left: 0;
-                font-family: "Rubik-Regular", Helvetica;
-                font-weight: 400;
-                color: #6b7280;
-                font-size: 14px;
-                letter-spacing: 0;
-                line-height: normal;
-            }
-
-            .view-profile-detail .text-wrapper-12 {
-                position: absolute;
-                width: 111px;
-                top: 30px;
-                left: 0;
-                font-family: "Rubik-Regular", Helvetica;
-                font-weight: 400;
-                color: #111827;
-                font-size: 16px;
-                letter-spacing: 0;
-                line-height: 16px;
-                white-space: nowrap;
-            }
-
-            .view-profile-detail .div-11 {
-                position: absolute;
-                width: 672px;
-                height: 52px;
-                top: 228px;
-                left: 0;
-                border: 0px none;
-            }
-
-            .view-profile-detail .text-wrapper-13 {
-                position: absolute;
-                width: 53px;
-                top: 1px;
-                left: 0;
-                font-family: "Rubik-Regular", Helvetica;
-                font-weight: 400;
-                color: #6b7280;
-                font-size: 14px;
-                letter-spacing: 0;
-                line-height: normal;
-            }
-
-            .view-profile-detail .text-wrapper-14 {
-                position: absolute;
-                width: 102px;
-                top: 30px;
-                left: 0;
-                font-family: "Rubik-Regular", Helvetica;
-                font-weight: 400;
-                color: #111827;
-                font-size: 16px;
-                letter-spacing: 0;
-                line-height: 16px;
-                white-space: nowrap;
-            }
-
-            .view-profile-detail .text-wrapper-15 {
-                position: absolute;
-                width: 87px;
-                top: 1px;
-                left: 0;
-                font-family: "Rubik-Regular", Helvetica;
-                font-weight: 400;
-                color: #6b7280;
-                font-size: 14px;
-                letter-spacing: 0;
-                line-height: normal;
-            }
-
-            .view-profile-detail .text-wrapper-16 {
-                width: 148px;
-                position: absolute;
-                top: 30px;
-                left: 0;
-                font-family: "Rubik-Regular", Helvetica;
-                font-weight: 400;
-                color: #111827;
-                font-size: 16px;
-                letter-spacing: 0;
-                line-height: 16px;
-                white-space: nowrap;
-            }
-
-            .view-profile-detail .button-wrapper {
-                position: absolute;
-                width: 672px;
-                height: 73px;
-                top: 505px;
-                left: 32px;
-                border-top-width: 1px;
-                border-top-style: solid;
-                border-color: #e5e7eb;
-            }
-
-            .view-profile-detail .button {
-                all: unset;
-                box-sizing: border-box;
-                position: relative;
-                width: 194px;
-                height: 40px;
-                top: 33px;
-                background-color: #2563eb;
-                border-radius: 8px;
-                border: 0px none;
-            }
-
-            .view-profile-detail .text-wrapper-17 {
-                position: absolute;
-                width: 134px;
-                top: 10px;
-                left: 40px;
-                font-family: "Rubik-Regular", Helvetica;
-                font-weight: 400;
-                color: #ffffff;
-                font-size: 16px;
-                text-align: center;
-                letter-spacing: 0;
-                line-height: normal;
-                white-space: nowrap;
-            }
-
-            .view-profile-detail .i {
-                position: absolute;
-                width: 16px;
-                height: 16px;
-                top: 12px;
-                left: 16px;
-                border: 0px none;
-            }
-
-            .view-profile-detail .svg {
-                display: flex;
-                width: 16px;
-                height: 16px;
-                align-items: center;
-                justify-content: center;
-                position: relative;
-            }
-
-            .view-profile-detail .frame {
-                position: relative;
-                width: 16px;
-                height: 16px;
+            .key-icon {
+                width: 1rem;
+                height: 1rem;
             }
         </style>
     </head>
     <body>
-        <div class="view-profile-detail">
-            <div class="body">
-                <div class="div">
-                    <div class="div-wrapper">
-                        <div class="div-2">
-                            <div class="div-3">
-                                <div class="div-4">
-                                    <div class="text-wrapper">${user.firstName} ${user.lastName}</div>
-                                </div>
-                            </div>
-                            <div class="div-5">
-                                <div class="div-6">
-                                    <div class="div-7">
-                                        <div class="label"><div class="text-wrapper-3">First Name</div></div>
-                                        <div class="text-wrapper-4">${user.firstName}</div>
-                                    </div>
-                                    <div class="div-8">
-                                        <div class="label"><div class="text-wrapper-5">Last Name</div></div>
-                                        <div class="text-wrapper-6">${user.lastName}</div>
-                                    </div>
-                                </div>
-                                <div class="div-9">
-                                    <div class="label-2"><div class="text-wrapper-7">Email Address</div></div>
-                                    <div class="text-wrapper-8">${user.emailAddress}</div>
-                                </div>
-                                <div class="div-10">
-                                    <div class="div-7">
-                                        <div class="label"><div class="text-wrapper-9">Phone Number</div></div>
-                                        <div class="text-wrapper-10">${user.phoneNumber}</div>
-                                    </div>
-                                    <div class="div-8">
-                                        <div class="label"><div class="text-wrapper-11">Date of Birth</div></div>
-                                        <div class="text-wrapper-12">${formattedDob}</div>
-                                    </div>
-                                </div>
-                                <div class="div-11">
-                                    <div class="div-7">
-                                        <div class="label"><div class="text-wrapper-13">Country</div></div>
-                                        <div class="text-wrapper-14">${user.country.name}</div>
-                                    </div>
-                                    <div class="div-8">
-                                        <div class="label"><div class="text-wrapper-15">Created Time</div></div>
-                                        <div class="text-wrapper-16">${formattedCreatedAt}</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="button-wrapper">
-                                <button class="button">
-                                    <a href="forgot-password" class="text-wrapper-17">Change Password</a>
-                                    <div class="i">
-                                        <div class="svg"><img class="frame" src="../img/key.svg" /></div>
-                                    </div>
-                                </button>
-                            </div>
-                        </div>
+        <!-- Back Button -->
+        <button class="back-button" onclick="window.history.back()">
+            <div class="back-arrow"></div>
+        </button>
+        
+        <div class="profile-container">
+            <div class="profile-content">
+                <div class="profile-header">
+                    <h1 class="profile-name">${user.firstName} ${user.lastName}</h1>
+                </div>
+
+                <div class="profile-divider"></div>
+
+                <div class="profile-details">
+                    <div>
+                        <label class="field-label">First Name</label>
+                        <p class="field-value">${user.firstName}</p>
                     </div>
+
+                    <div>
+                        <label class="field-label">Last Name</label>
+                        <p class="field-value">${user.lastName}</p>
+                    </div>
+
+                    <div>
+                        <label class="field-label">Email Address</label>
+                        <p class="field-value">${user.emailAddress}</p>
+                    </div>
+
+                    <div>
+                        <label class="field-label">Date of Birth</label>
+                        <p class="field-value">${formattedDob}</p>
+                    </div>
+
+                    <div>
+                        <label class="field-label">Phone Number</label>
+                        <p class="field-value">${user.phoneNumber}</p>
+                    </div>
+
+                    <div>
+                        <label class="field-label">Created Time</label>
+                        <p class="field-value">${formattedCreatedAt}</p>
+                    </div>
+
+                    <div>
+                        <label class="field-label">Country</label>
+                        <p class="field-value">${user.country.name}</p>
+                    </div>
+                </div>
+
+                <div class="button-container">
+                    <button class="change-password-btn">
+                        <svg class="key-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+                        </svg>
+                        <a href="forgot-password" class="button-href">Change Password</a>
+                    </button>
                 </div>
             </div>
         </div>

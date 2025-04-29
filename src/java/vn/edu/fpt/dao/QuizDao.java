@@ -10,177 +10,131 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vn.edu.fpt.model.Quiz;
-import vn.edu.fpt.model.User;
 
 /**
  *
- * @author ADMIN
+ * @author Rinaaaa
  */
 public class QuizDao extends DBContext {
-    
-    public List<Quiz> getQuizzesByTeacher(int teacherId) {
-        List<Quiz> quizzes = new ArrayList<>();
+
+    public void create(Quiz quiz) {
+        String sql = """
+                     INSERT INTO [dbo].[Quiz]( 
+                        [teacherId] ,[title] ,[description],
+                        [code], [timeLimit], [status])
+                     VALUES (?, ?, ?, ?, ?, ?)
+                     """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, quiz.getTeacher().getId());
+            stm.setNString(2, quiz.getTitle());
+            stm.setNString(3, quiz.getDescription());
+            stm.setString(4, quiz.getCode());
+            stm.setInt(5, quiz.getTimeLimit());
+            stm.setString(6, quiz.getStatus());
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(QuizDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public Quiz get(int id) {
         UserDao userDao = new UserDao();
-        
+        Quiz quiz = null;
+        String sql = """
+                     SELECT [id], [teacherId] ,[title],
+                            [description], [code], [timeLimit],
+                            [status], [createdAt]
+                     FROM [Quiz]
+                     WHERE [id] = ?
+                     """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, id);
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                quiz = new Quiz();
+                quiz.setId(rs.getInt("id"));
+                quiz.setTeacher(userDao.getUser(rs.getInt("teacherId")));
+                quiz.setTitle(rs.getNString("title"));
+                quiz.setDescription(rs.getNString("description"));
+                quiz.setCode(rs.getString("code"));
+                quiz.setTimeLimit(rs.getInt("timeLimit"));
+                quiz.setStatus(rs.getString("status"));
+                quiz.setCreatedAt(rs.getTimestamp("createdAt"));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(QuizDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return quiz;
+    }
+
+    public Quiz get(String input) {
+        UserDao userDao = new UserDao();
+        Quiz quiz = null;
+        String sql = """
+                     SELECT [id], [teacherId] ,[title],
+                            [description], [code], [timeLimit],
+                            [status], [createdAt]
+                     FROM [Quiz]
+                     WHERE [code] = ? OR [title] = ? 
+                     """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setString(1, input);
+            stm.setString(2, input);
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                quiz = new Quiz();
+                quiz.setId(rs.getInt("id"));
+                quiz.setTeacher(userDao.getUser(rs.getInt("teacherId")));
+                quiz.setTitle(rs.getNString("title"));
+                quiz.setDescription(rs.getNString("description"));
+                quiz.setCode(rs.getString("code"));
+                quiz.setTimeLimit(rs.getInt("timeLimit"));
+                quiz.setStatus(rs.getString("status"));
+                quiz.setCreatedAt(rs.getTimestamp("createdAt"));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(QuizDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return quiz;
+    }
+
+    public List<Quiz> list(int teacherId) {
+        UserDao userDao = new UserDao();
+        List<Quiz> quizzes = new ArrayList<>();
         String sql = """
                      SELECT [id], [teacherId], [title], [description], 
-                            [code], [timeLimit], [status], [createdAt]
-                     FROM [Quiz]
+                     [code], [timeLimit], [status], [createdAt] FROM [dbo].[Quiz]
                      WHERE [teacherId] = ?
-                     ORDER BY [createdAt] DESC
                      """;
-        
+
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, teacherId);
             ResultSet rs = stm.executeQuery();
-            
             while (rs.next()) {
                 Quiz quiz = new Quiz();
                 quiz.setId(rs.getInt("id"));
-                
-                User teacher = userDao.getUserById(rs.getInt("teacherId"));
-                quiz.setTeacher(teacher);
-                
+                quiz.setTeacher(userDao.getUser(rs.getInt("teacherId")));
                 quiz.setTitle(rs.getString("title"));
                 quiz.setDescription(rs.getString("description"));
                 quiz.setCode(rs.getString("code"));
                 quiz.setTimeLimit(rs.getInt("timeLimit"));
                 quiz.setStatus(rs.getString("status"));
                 quiz.setCreatedAt(rs.getTimestamp("createdAt"));
-                
                 quizzes.add(quiz);
             }
         } catch (SQLException ex) {
             Logger.getLogger(QuizDao.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
         return quizzes;
     }
-    
-    public Quiz getQuizById(int quizId) {
-        Quiz quiz = null;
-        UserDao userDao = new UserDao();
-        
-        String sql = """
-                     SELECT [id], [teacherId], [title], [description], 
-                            [code], [timeLimit], [status], [createdAt]
-                     FROM [Quiz]
-                     WHERE [id] = ?
-                     """;
-        
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, quizId);
-            ResultSet rs = stm.executeQuery();
-            
-            if (rs.next()) {
-                quiz = new Quiz();
-                quiz.setId(rs.getInt("id"));
-                
-                User teacher = userDao.getUserById(rs.getInt("teacherId"));
-                quiz.setTeacher(teacher);
-                
-                quiz.setTitle(rs.getString("title"));
-                quiz.setDescription(rs.getString("description"));
-                quiz.setCode(rs.getString("code"));
-                quiz.setTimeLimit(rs.getInt("timeLimit"));
-                quiz.setStatus(rs.getString("status"));
-                quiz.setCreatedAt(rs.getTimestamp("createdAt"));
+
+    public boolean isCodeExists(String code) throws SQLException {
+        String sql = "SELECT 1 FROM [Quiz] WHERE [code] = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, code);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(QuizDao.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        return quiz;
-    }
-    
-    public void createQuiz(Quiz quiz) {
-        String sql = """
-                     INSERT INTO [Quiz] ([teacherId], [title], [description], 
-                                        [code], [timeLimit], [status])
-                     VALUES (?, ?, ?, ?, ?, ?)
-                     """;
-        
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, quiz.getTeacher().getId());
-            stm.setString(2, quiz.getTitle());
-            stm.setString(3, quiz.getDescription());
-            stm.setString(4, quiz.getCode());
-            stm.setInt(5, quiz.getTimeLimit());
-            stm.setString(6, quiz.getStatus());
-            
-            stm.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(QuizDao.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
-    public void updateQuiz(Quiz quiz) {
-        String sql = """
-                     UPDATE [Quiz]
-                     SET [title] = ?, 
-                         [description] = ?, 
-                         [timeLimit] = ?, 
-                         [status] = ?
-                     WHERE [id] = ?
-                     """;
-        
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setString(1, quiz.getTitle());
-            stm.setString(2, quiz.getDescription());
-            stm.setInt(3, quiz.getTimeLimit());
-            stm.setString(4, quiz.getStatus());
-            stm.setInt(5, quiz.getId());
-            
-            stm.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(QuizDao.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
-    public void deleteQuiz(int quizId) {
-        String sql = "DELETE FROM [Quiz] WHERE [id] = ?";
-        
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, quizId);
-            stm.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(QuizDao.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
-    public int countQuestionsByQuizId(int quizId) {
-        int count = 0;
-        String sql = "SELECT COUNT(*) AS questionCount FROM [Question] WHERE [quizId] = ?";
-        
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, quizId);
-            ResultSet rs = stm.executeQuery();
-            
-            if (rs.next()) {
-                count = rs.getInt("questionCount");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(QuizDao.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        return count;
-    }
-    
-    public int countAttemptsByQuizId(int quizId) {
-        int count = 0;
-        String sql = "SELECT COUNT(*) AS attemptCount FROM [QuizAttempt] WHERE [quizId] = ?";
-        
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, quizId);
-            ResultSet rs = stm.executeQuery();
-            
-            if (rs.next()) {
-                count = rs.getInt("attemptCount");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(QuizDao.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        return count;
     }
 }

@@ -22,8 +22,6 @@ public class SigninController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -61,13 +59,11 @@ public class SigninController extends HttpServlet {
                         usernameCookie.setMaxAge(0);
                         response.addCookie(usernameCookie);
                     }
-                    if (user.getRole().getName().equals("Teacher")) {
-                        response.sendRedirect(request.getContextPath() + "/teachers/home");
-                    } else if (user.getRole().getName().equals("Student")) {
-                        response.sendRedirect(request.getContextPath() + "/home");
-                    }
-                    else {
-                        response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+                    
+                    switch (user.getRole().getName()) {
+                        case "Teacher" -> response.sendRedirect(request.getContextPath() + "/quiz/list");
+                        case "Student" -> response.sendRedirect(request.getContextPath() + "/home");
+                        default -> response.sendRedirect(request.getContextPath() + "/admin/dashboard");
                     }
                     
                 } else {

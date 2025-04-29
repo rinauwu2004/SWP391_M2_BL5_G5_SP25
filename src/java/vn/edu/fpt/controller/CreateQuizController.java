@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 
-package vn.edu.fpt.dao;
+package vn.edu.fpt.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -12,47 +12,20 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import vn.edu.fpt.dao.QuizDao;
 import vn.edu.fpt.model.Quiz;
 import vn.edu.fpt.model.User;
+import static vn.edu.fpt.util.RandomQuizCode.generateRandomCode;
 
 /**
  *
  * @author Rinaaaa
  */
 public class CreateQuizController extends HttpServlet {
-   
-    /** 
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet CreateQuizController</title>");  
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet CreateQuizController at " + request.getContextPath () + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    } 
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
-     * Handles the HTTP <code>GET</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
@@ -68,20 +41,25 @@ public class CreateQuizController extends HttpServlet {
         request.getRequestDispatcher("../createQuiz.jsp").forward(request, response);
     }
 
-    /** 
-     * Handles the HTTP <code>POST</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         HttpSession session = request.getSession();
+        QuizDao quizDao = new QuizDao();
         User teacher = (User) session.getAttribute("user");
         String title = request.getParameter("title");
         String description = request.getParameter("description");
+        String code = "";
+        
+        try {
+            do {
+                code = generateRandomCode();
+            }
+            while (quizDao.isCodeExists(code));
+        } catch (SQLException ex) {
+            Logger.getLogger(CreateQuizController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         int timeLimit = Integer.parseInt(request.getParameter("timeLimit"));
         String status = request.getParameter("status").isEmpty() ? null : request.getParameter("status");
         
@@ -97,10 +75,12 @@ public class CreateQuizController extends HttpServlet {
         quiz.setDescription(description);
         quiz.setTimeLimit(timeLimit);
         quiz.setStatus(status);
-        
-        QuizDao quizDao = new QuizDao();
+        quiz.setCode(code);
         quizDao.create(quiz);
         
+        quiz = quizDao.get(code);
+        
+        request.setAttribute("quiz", quiz);
         request.getRequestDispatcher("../createQuestion.jsp").forward(request, response);
     }
 

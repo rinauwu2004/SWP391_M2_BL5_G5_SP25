@@ -31,7 +31,7 @@
                         <ul>
                             <li><a href="<%=request.getContextPath()%>/home">Home</a></li>
                             <li><a href="<%=request.getContextPath()%>/quiz/list">Quizzes</a></li>
-                            <li><a href="<%=request.getContextPath()%>/category">Categories</a></li>
+                            <li><a href="categories.jsp">Categories</a></li>
                             <li><a href="#footer-section">About</a></li>
                         </ul>
                     </nav>
@@ -52,9 +52,16 @@
                 </div>
             </div>
         </header>
-        <c:if test="${not empty message}">
-            <p style="margin-top: 10px; margin-bottom: 10px; color:green; text-align: center; font-size: 16px;">${message}</p>
+
+        <c:if test="${not empty requestScope.message}">
+            <p style="margin-top: 10px; margin-bottom: 10px; color:green; text-align: center; font-size: 16px;">${requestScope.message}</p>
         </c:if>
+
+        <c:if test="${not empty sessionScope.message}">
+            <p style="margin-top: 10px; margin-bottom: 10px; color:green; text-align: center; font-size: 16px;">${sessionScope.message}</p>
+            <c:set var="sessionScope.message" value="${null}" scope="session" />
+        </c:if>
+
         <!-- Hero Section -->
         <section class="hero">
             <div class="container">
@@ -184,21 +191,19 @@
         </section>
 
         <!-- Call to Action -->
-        <c:if test="${empty sessionScope.user}">
-            <section class="cta">
-                <div class="container">
-                    <h2>Ready to Test Your Knowledge?</h2>
-                    <p>Join thousands of users and start your learning journey today!</p>
-                    <a href="${pageContext.request.contextPath}/signup" class="btn btn-light">
-                        Create Free Account
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </section>
-        </c:if>
+        <section class="cta">
+            <div class="container">
+                <h2>Ready to Test Your Knowledge?</h2>
+                <p>Join thousands of users and start your learning journey today!</p>
+                <a href="<%=request.getContextPath()%>/signup" class="btn btn-light">
+                    Create Free Account
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </section>
 
         <!-- Footer -->
-        <footer id='footer-section'>
+        <footer id="footer-section">
             <div class="container">
                 <div class="footer-grid">
                     <div class="footer-brand">

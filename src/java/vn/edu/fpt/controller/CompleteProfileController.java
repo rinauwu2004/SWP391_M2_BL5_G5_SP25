@@ -159,7 +159,7 @@ public class CompleteProfileController extends HttpServlet {
         session.removeAttribute("tempUser");
 
         session.setAttribute("user", tempUser);
-
+        session.setAttribute("message", "Sign up successfully.");
         response.sendRedirect(request.getContextPath() + "/home");
     }
 }
