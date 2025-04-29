@@ -3,8 +3,26 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/tuhoc/New%20folder%20(4)/SWP391_M2_BL5_G5_SP25-main/src/java/vn/edu/fpt/controller/lesson/LessonCreateServlet.java</file>
-            <file>file:/D:/tuhoc/New%20folder%20(4)/SWP391_M2_BL5_G5_SP25-main/src/java/vn/edu/fpt/controller/module/AddModuleServlet.java</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25-main/web/views/admin/lesson/listLesson.jsp</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25-main/web/views/admin/lesson/lessonDetail.jsp</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25-main/web/views/admin/subject/listSubject.jsp</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25-main/src/java/vn/edu/fpt/controller/lesson/LessonEditServlet.java</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25-main/web/views/admin/lesson/editLesson.jsp</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25-main/web/views/admin/subject/viewSubject.jsp</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25-main/src/java/vn/edu/fpt/dao/DBContext.java</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25-main/web/views/admin/lesson/createLesson.jsp</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25-main/web/ViewUser.jsp</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25-main/web/index.html</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25-main/src/java/vn/edu/fpt/controller/module/AddModuleServlet.java</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25-main/web/ListUsers.jsp</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25-main/web/notification.jsp</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25-main/web/views/admin/subject/addSubject.jsp</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25-main/src/java/vn/edu/fpt/model/Lesson.java</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25-main/web/Homepage.jsp</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25-main/web/views/admin/subject/newjsp.jsp</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25-main/src/java/vn/edu/fpt/dao/ModuleDAO.java</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25-main/web/EditUser.jsp</file>
+            <file>file:/D:/Kì%205%20Block/SWP391/SWP391_M2_BL5_G5_SP25-main/web/views/admin/subject/editSubject.jsp</file>
         </group>
     </open-files>
 </project-private>
