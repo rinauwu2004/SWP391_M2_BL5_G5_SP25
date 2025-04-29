@@ -30,9 +30,9 @@
                     <nav>
                         <ul>
                             <li><a href="<%=request.getContextPath()%>/home">Home</a></li>
-                            <li><a href="quizzes.jsp">Quizzes</a></li>
+                            <li><a href="<%=request.getContextPath()%>/quiz/list">Quizzes</a></li>
                             <li><a href="categories.jsp">Categories</a></li>
-                            <li><a href="about.jsp">About</a></li>
+                            <li><a href="#footer-section">About</a></li>
                         </ul>
                     </nav>
                     <div class="auth-buttons">
@@ -203,7 +203,7 @@
         </section>
 
         <!-- Footer -->
-        <footer>
+        <footer id="footer-section">
             <div class="container">
                 <div class="footer-grid">
                     <div class="footer-brand">

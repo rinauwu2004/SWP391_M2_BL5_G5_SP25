@@ -268,7 +268,7 @@
     </head>
     <body>
         <!-- Back Button -->
-        <button class="back-button" onclick="window.history.back()">
+        <button class="back-button" onclick="window.location.href='<%=request.getContextPath()%>/home'">
             <div class="back-arrow"></div>
         </button>
 
