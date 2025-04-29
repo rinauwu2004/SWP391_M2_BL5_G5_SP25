@@ -5,6 +5,8 @@
 package vn.edu.fpt.dao;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vn.edu.fpt.model.Quiz;
@@ -95,7 +97,37 @@ public class QuizDao extends DBContext {
         }
         return quiz;
     }
-    
+
+    public List<Quiz> list(int teacherId) {
+        UserDao userDao = new UserDao();
+        List<Quiz> quizzes = new ArrayList<>();
+        String sql = """
+                     SELECT [id], [teacherId], [title], [description], 
+                     [code], [timeLimit], [status], [createdAt] FROM [dbo].[Quiz]
+                     WHERE [teacherId] = ?
+                     """;
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, teacherId);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                Quiz quiz = new Quiz();
+                quiz.setId(rs.getInt("id"));
+                quiz.setTeacher(userDao.getUser(rs.getInt("teacherId")));
+                quiz.setTitle(rs.getString("title"));
+                quiz.setDescription(rs.getString("description"));
+                quiz.setCode(rs.getString("code"));
+                quiz.setTimeLimit(rs.getInt("timeLimit"));
+                quiz.setStatus(rs.getString("status"));
+                quiz.setCreatedAt(rs.getTimestamp("createdAt"));
+                quizzes.add(quiz);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(QuizDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return quizzes;
+    }
+
     public boolean isCodeExists(String code) throws SQLException {
         String sql = "SELECT 1 FROM [Quiz] WHERE [code] = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {

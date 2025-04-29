@@ -11,6 +11,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import java.util.List;
+import vn.edu.fpt.dao.QuizDao;
+import vn.edu.fpt.model.Quiz;
+import vn.edu.fpt.model.User;
 
 /**
  *
@@ -29,8 +34,20 @@ public class ListQuizController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            String message = "You do not have right to access this page";
+            request.setAttribute("errorMessage", message);
+            request.getRequestDispatcher("../errorPage.jsp").forward(request, response);
+            return;
+        }
+        
+        QuizDao quizDao = new QuizDao();
+        List<Quiz> quizzes = quizDao.list(user.getId());
+        request.setAttribute("quizzes", quizzes);
         request.getRequestDispatcher("../listQuiz.jsp").forward(request, response);
-    } 
+    }
 
     /** 
      * Handles the HTTP <code>POST</code> method.
