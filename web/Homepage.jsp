@@ -29,10 +29,10 @@
                     </div>
                     <nav>
                         <ul>
-                            <li><a href="Homepage.jsp">Home</a></li>
-                            <li><a href="quizzes.jsp">Quizzes</a></li>
-                            <li><a href="categories.jsp">Categories</a></li>
-                            <li><a href="about.jsp">About</a></li>
+                            <li><a href="<%=request.getContextPath()%>/home">Home</a></li>
+                            <li><a href="<%=request.getContextPath()%>/quiz/list">Quizzes</a></li>
+                            <li><a href="<%=request.getContextPath()%>/category">Categories</a></li>
+                            <li><a href="#footer-section">About</a></li>
                         </ul>
                     </nav>
                     <div class="auth-buttons">
@@ -184,19 +184,21 @@
         </section>
 
         <!-- Call to Action -->
-        <section class="cta">
-            <div class="container">
-                <h2>Ready to Test Your Knowledge?</h2>
-                <p>Join thousands of users and start your learning journey today!</p>
-                <a href="<%=request.getContextPath()%>/signup" class="btn btn-light">
-                    Create Free Account
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-        </section>
+        <c:if test="${empty sessionScope.user}">
+            <section class="cta">
+                <div class="container">
+                    <h2>Ready to Test Your Knowledge?</h2>
+                    <p>Join thousands of users and start your learning journey today!</p>
+                    <a href="${pageContext.request.contextPath}/signup" class="btn btn-light">
+                        Create Free Account
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </section>
+        </c:if>
 
         <!-- Footer -->
-        <footer>
+        <footer id='footer-section'>
             <div class="container">
                 <div class="footer-grid">
                     <div class="footer-brand">

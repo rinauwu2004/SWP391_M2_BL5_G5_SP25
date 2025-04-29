@@ -61,8 +61,15 @@ public class SigninController extends HttpServlet {
                         usernameCookie.setMaxAge(0);
                         response.addCookie(usernameCookie);
                     }
-
-                    response.sendRedirect(request.getContextPath() + "/home");
+                    if (user.getRole().getName().equals("Teacher")) {
+                        response.sendRedirect(request.getContextPath() + "/teachers/home");
+                    } else if (user.getRole().getName().equals("Student")) {
+                        response.sendRedirect(request.getContextPath() + "/home");
+                    }
+                    else {
+                        response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+                    }
+                    
                 } else {
                     request.setAttribute("error", "Invalid username or password.");
                     request.getRequestDispatcher("/Signin.jsp").forward(request, response);
