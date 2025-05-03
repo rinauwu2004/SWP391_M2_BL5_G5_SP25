@@ -10,6 +10,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import vn.edu.fpt.dao.UserDao;
 import vn.edu.fpt.model.User;
 import static vn.edu.fpt.util.PasswordEncryption.checkPassword;
@@ -59,13 +60,23 @@ public class SigninController extends HttpServlet {
                         usernameCookie.setMaxAge(0);
                         response.addCookie(usernameCookie);
                     }
-                    
-                    switch (user.getRole().getName()) {
-                        case "Teacher" -> response.sendRedirect(request.getContextPath() + "/quiz/list");
-                        case "Student" -> response.sendRedirect(request.getContextPath() + "/home");
-                        default -> response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+
+                    // Redirect based on role ID
+                    int roleId = user.getRole().getId();
+                    switch (roleId) {
+                        case 1: // Admin
+                            response.sendRedirect(request.getContextPath() + "/admin/home");
+                            break;
+                        case 2: // Student
+                            response.sendRedirect(request.getContextPath() + "/home");
+                            break;
+                        case 3: // Teacher
+                            response.sendRedirect(request.getContextPath() + "/teacher/home");
+                            break;
+                        default:
+                            response.sendRedirect(request.getContextPath() + "/home");
+                            break;
                     }
-                    
                 } else {
                     request.setAttribute("error", "Invalid username or password.");
                     request.getRequestDispatcher("/Signin.jsp").forward(request, response);
@@ -78,6 +89,7 @@ public class SigninController extends HttpServlet {
             request.getRequestDispatcher("/Signin.jsp").forward(request, response);
         }
     }
+
 
     
 

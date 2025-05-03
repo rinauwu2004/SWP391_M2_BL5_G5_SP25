@@ -18,6 +18,25 @@ import javax.crypto.spec.PBEKeySpec;
  * @author Rinaaaa
  */
 public class PasswordEncryption {
+    /**
+     * Hashes a password and returns the hash and salt as a String array.
+     *
+     * @param password The password to hash
+     * @return A String array where index 0 is the hash and index 1 is the salt
+     */
+    public static String[] hashPassword(String password) {
+        byte[] salt = generateSalt();
+        String saltString = encodePassword(salt);
+        String hashString = null;
+
+        try {
+            hashString = passwordEncyption(password, salt);
+        } catch (Exception ex) {
+            Logger.getLogger(PasswordEncryption.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return new String[] { hashString, saltString };
+    }
     public static String passwordEncyption(String password, byte[] passwordSalt) throws Exception {
         try {
             byte[] salt = passwordSalt;

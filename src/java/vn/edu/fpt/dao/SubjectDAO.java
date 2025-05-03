@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -340,18 +341,306 @@ public class SubjectDAO extends DBContext {
         LOGGER.log(Level.SEVERE, "Error deactivating subject with ID {0}: {1}", new Object[]{id, e.getMessage()});
         throw new RuntimeException("Error deactivating subject", e);
     }
-}
+    public List<Subject> getAllSubjects() {
+        List<Subject> subjects = new ArrayList<>();
+        String sql = """
+                     SELECT [id], [code], [name], [description], [status], [created_at], [modified_at] 
+                     FROM [Subject]
+                     ORDER BY [name]
+                     """;
 
+        try (PreparedStatement stm = connection.prepareStatement(sql);
+             ResultSet rs = stm.executeQuery()) {
 
-    public static void main(String[] args) {
-        SubjectDAO sdao = new SubjectDAO();
-        String search = "";
-        Boolean status = null;
-
-        List<Subject> subjects = sdao.getSubjectsFiltered(search, status, 0, 5);
-        for (Subject subject : subjects) {
-            System.out.println(subject.toString());
+            while (rs.next()) {
+                Subject subject = new Subject();
+                subject.setId(rs.getInt("id"));
+                subject.setCode(rs.getString("code"));
+                subject.setName(rs.getString("name"));
+                subject.setDescription(rs.getString("description"));
+                subject.setStatus(rs.getBoolean("status"));
+                subject.setCreatedAt(rs.getTimestamp("created_at"));
+                subject.setModifiedAt(rs.getTimestamp("modified_at"));
+                subjects.add(subject);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SubjectDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        return subjects;
+    }
+
+
+    public int countAllSubjects() {
+        int count = 0;
+        String sql = "SELECT COUNT(*) AS subjectCount FROM [Subject]";
+
+        try (PreparedStatement stm = connection.prepareStatement(sql);
+             ResultSet rs = stm.executeQuery()) {
+
+            if (rs.next()) {
+                count = rs.getInt("subjectCount");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SubjectDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return count;
+    }
+
+    public int countActiveSubjects() {
+        int count = 0;
+        String sql = "SELECT COUNT(*) AS subjectCount FROM [Subject] WHERE [status] = 1";
+
+        try (PreparedStatement stm = connection.prepareStatement(sql);
+             ResultSet rs = stm.executeQuery()) {
+
+            if (rs.next()) {
+                count = rs.getInt("subjectCount");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SubjectDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return count;
+    }
+
+    public List<String> getAllSubjectNames() {
+        List<String> subjectNames = new ArrayList<>();
+        String sql = "SELECT [name] FROM [Subject] WHERE [status] = 1 ORDER BY [name]";
+
+        try (PreparedStatement stm = connection.prepareStatement(sql);
+             ResultSet rs = stm.executeQuery()) {
+
+            while (rs.next()) {
+                subjectNames.add(rs.getString("name"));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SubjectDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return subjectNames;
+    }
+
+    public List<Subject> getSubjectsWithPagination(int offset, int limit) {
+        List<Subject> subjects = new ArrayList<>();
+        String sql = """
+                     SELECT [id], [code], [name], [description], [status], [created_at], [modified_at]
+                     FROM [Subject]
+                     ORDER BY [name]
+                     OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+                     """;
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, offset);
+            stm.setInt(2, limit);
+            ResultSet rs = stm.executeQuery();
+
+            while (rs.next()) {
+                Subject subject = new Subject();
+                subject.setId(rs.getInt("id"));
+                subject.setCode(rs.getString("code"));
+                subject.setName(rs.getString("name"));
+                subject.setDescription(rs.getString("description"));
+                subject.setStatus(rs.getBoolean("status"));
+                subject.setCreatedAt(rs.getTimestamp("created_at"));
+                subject.setModifiedAt(rs.getTimestamp("modified_at"));
+                subjects.add(subject);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SubjectDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return subjects;
+    }
+
+    public List<Subject> searchSubjects(String searchTerm, String searchBy, int offset, int limit) {
+        List<Subject> subjects = new ArrayList<>();
+        String sql;
+
+        switch (searchBy) {
+            case "code":
+                sql = """
+                      SELECT [id], [code], [name], [description], [status], [created_at], [modified_at]
+                      FROM [Subject]
+                      WHERE [code] LIKE ?
+                      ORDER BY [name]
+                      OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+                      """;
+                break;
+            case "name":
+                sql = """
+                      SELECT [id], [code], [name], [description], [status], [created_at], [modified_at]
+                      FROM [Subject]
+                      WHERE [name] LIKE ?
+                      ORDER BY [name]
+                      OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+                      """;
+                break;
+            default:
+                sql = """
+                      SELECT [id], [code], [name], [description], [status], [created_at], [modified_at]
+                      FROM [Subject]
+                      WHERE [code] LIKE ? OR [name] LIKE ? OR [description] LIKE ?
+                      ORDER BY [name]
+                      OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+                      """;
+                break;
+        }
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            String searchPattern = "%" + searchTerm + "%";
+
+            switch (searchBy) {
+                case "code":
+                case "name":
+                    stm.setString(1, searchPattern);
+                    stm.setInt(2, offset);
+                    stm.setInt(3, limit);
+                    break;
+                default:
+                    stm.setString(1, searchPattern);
+                    stm.setString(2, searchPattern);
+                    stm.setString(3, searchPattern);
+                    stm.setInt(4, offset);
+                    stm.setInt(5, limit);
+                    break;
+            }
+
+            ResultSet rs = stm.executeQuery();
+
+            while (rs.next()) {
+                Subject subject = new Subject();
+                subject.setId(rs.getInt("id"));
+                subject.setCode(rs.getString("code"));
+                subject.setName(rs.getString("name"));
+                subject.setDescription(rs.getString("description"));
+                subject.setStatus(rs.getBoolean("status"));
+                subject.setCreatedAt(rs.getTimestamp("created_at"));
+                subject.setModifiedAt(rs.getTimestamp("modified_at"));
+                subjects.add(subject);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SubjectDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return subjects;
+    }
+
+    public int countSearchResults(String searchTerm, String searchBy) {
+        int count = 0;
+        String sql;
+
+        switch (searchBy) {
+            case "code":
+                sql = "SELECT COUNT(*) AS subjectCount FROM [Subject] WHERE [code] LIKE ?";
+                break;
+            case "name":
+                sql = "SELECT COUNT(*) AS subjectCount FROM [Subject] WHERE [name] LIKE ?";
+                break;
+            default:
+                sql = "SELECT COUNT(*) AS subjectCount FROM [Subject] WHERE [code] LIKE ? OR [name] LIKE ? OR [description] LIKE ?";
+                break;
+        }
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            String searchPattern = "%" + searchTerm + "%";
+
+            switch (searchBy) {
+                case "code":
+                case "name":
+                    stm.setString(1, searchPattern);
+                    break;
+                default:
+                    stm.setString(1, searchPattern);
+                    stm.setString(2, searchPattern);
+                    stm.setString(3, searchPattern);
+                    break;
+            }
+
+            ResultSet rs = stm.executeQuery();
+
+            if (rs.next()) {
+                count = rs.getInt("subjectCount");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SubjectDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return count;
+    }
+
+    public void createSubject(Subject subject) {
+        String sql = """
+                     INSERT INTO [Subject] ([code], [name], [description], [status])
+                     VALUES (?, ?, ?, ?)
+                     """;
+
+        try (PreparedStatement stm = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stm.setString(1, subject.getCode());
+            stm.setString(2, subject.getName());
+            stm.setString(3, subject.getDescription());
+            stm.setBoolean(4, subject.isStatus());
+
+            stm.executeUpdate();
+
+            // Get the generated ID
+            try (ResultSet generatedKeys = stm.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    subject.setId(generatedKeys.getInt(1));
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SubjectDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void updateSubject(Subject subject) {
+        String sql = """
+                     UPDATE [Subject]
+                     SET [code] = ?,
+                         [name] = ?,
+                         [description] = ?,
+                         [status] = ?,
+                         [modified_at] = GETDATE()
+                     WHERE [id] = ?
+                     """;
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setString(1, subject.getCode());
+            stm.setString(2, subject.getName());
+            stm.setString(3, subject.getDescription());
+            stm.setBoolean(4, subject.isStatus());
+            stm.setInt(5, subject.getId());
+
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(SubjectDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void deleteSubject(int subjectId) {
+        String sql = "DELETE FROM [Subject] WHERE [id] = ?";
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, subjectId);
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(SubjectDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
+
+
+//    public static void main(String[] args) {
+//        SubjectDAO sdao = new SubjectDAO();
+//        String search = "";
+//        Boolean status = null;
+//
+//        List<Subject> subjects = sdao.getSubjectsFiltered(search, status, 0, 5);
+//        for (Subject subject : subjects) {
+//            System.out.println(subject.toString());
+//        }
+//
+//    }
+

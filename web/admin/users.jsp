@@ -1,0 +1,926 @@
+<%--
+    Document   : users
+    Created on : Apr 30, 2025, 1:30:00 AM
+    Author     : ADMIN
+--%>
+
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>User Management - QuizMaster Admin</title>
+        <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() + "/css/styles.css" %>">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            }
+
+            body {
+                background-color: #f5f5f5;
+                color: #333;
+                line-height: 1.6;
+                display: flex;
+                min-height: 100vh;
+            }
+
+            /* Sidebar Styles */
+            .sidebar {
+                width: 250px;
+                background-color: #1f2937;
+                color: #f9fafb;
+                position: fixed;
+                height: 100vh;
+                overflow-y: auto;
+                transition: all 0.3s;
+                z-index: 1000;
+            }
+
+            .sidebar-header {
+                padding: 20px;
+                border-bottom: 1px solid #374151;
+            }
+
+            .sidebar .logo {
+                display: flex;
+                align-items: center;
+                font-weight: 700;
+                font-size: 1.5rem;
+                color: #f9fafb;
+                text-decoration: none;
+                margin-bottom: 10px;
+            }
+
+            .sidebar .logo-icon {
+                margin-right: 8px;
+                font-size: 1.8rem;
+            }
+
+            .user-info {
+                display: flex;
+                align-items: center;
+                padding: 15px 20px;
+                border-bottom: 1px solid #374151;
+            }
+
+            .user-avatar {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background-color: #4f46e5;
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.2rem;
+                margin-right: 10px;
+            }
+
+            .user-details {
+                flex: 1;
+            }
+
+            .user-name {
+                font-weight: 500;
+                color: #f9fafb;
+                font-size: 0.9rem;
+            }
+
+            .user-role {
+                color: #9ca3af;
+                font-size: 0.8rem;
+            }
+
+            .sidebar-menu {
+                padding: 20px 0;
+            }
+
+            .menu-label {
+                padding: 0 20px;
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                color: #9ca3af;
+                margin-bottom: 10px;
+                letter-spacing: 0.05em;
+            }
+
+            .sidebar-menu ul {
+                list-style: none;
+            }
+
+            .sidebar-menu ul li {
+                margin-bottom: 5px;
+            }
+
+            .sidebar-menu ul li a {
+                display: flex;
+                align-items: center;
+                padding: 10px 20px;
+                color: #d1d5db;
+                text-decoration: none;
+                transition: all 0.3s;
+                font-weight: 500;
+            }
+
+            .sidebar-menu ul li a:hover {
+                background-color: #374151;
+                color: #f9fafb;
+            }
+
+            .sidebar-menu ul li a.active {
+                background-color: #4f46e5;
+                color: #f9fafb;
+            }
+
+            .menu-icon {
+                margin-right: 10px;
+                width: 20px;
+                text-align: center;
+            }
+
+            .sidebar-footer {
+                padding: 15px 20px;
+                border-top: 1px solid #374151;
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+            }
+
+            .logout-btn {
+                display: flex;
+                align-items: center;
+                color: #d1d5db;
+                text-decoration: none;
+                transition: color 0.3s;
+                font-weight: 500;
+            }
+
+            .logout-btn:hover {
+                color: #f9fafb;
+            }
+
+            .logout-icon {
+                margin-right: 10px;
+            }
+
+            /* Main Content Styles */
+            .main-content {
+                flex: 1;
+                margin-left: 250px;
+                padding: 20px;
+                transition: all 0.3s;
+            }
+
+            /* Mobile Toggle Button */
+            .mobile-toggle {
+                display: none;
+                position: fixed;
+                top: 15px;
+                left: 15px;
+                z-index: 999;
+            }
+
+            .toggle-btn {
+                background-color: #4f46e5;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+
+            .toggle-btn:hover {
+                background-color: #4338ca;
+            }
+
+            .btn {
+                display: inline-block;
+                padding: 8px 16px;
+                border-radius: 6px;
+                font-weight: 500;
+                text-align: center;
+                text-decoration: none;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+
+            .btn-sm {
+                padding: 6px 12px;
+                font-size: 0.875rem;
+            }
+
+            .btn-primary {
+                background-color: #4f46e5;
+                color: white;
+                border: 1px solid #4f46e5;
+            }
+
+            .btn-primary:hover {
+                background-color: #4338ca;
+                border-color: #4338ca;
+            }
+
+            .btn-outline {
+                background-color: transparent;
+                color: #4f46e5;
+                border: 1px solid #4f46e5;
+                margin-right: 10px;
+            }
+
+            .btn-outline:hover {
+                background-color: #4f46e5;
+                color: white;
+            }
+
+            .btn-danger {
+                background-color: #ef4444;
+                color: white;
+                border: 1px solid #ef4444;
+            }
+
+            .btn-danger:hover {
+                background-color: #dc2626;
+                border-color: #dc2626;
+            }
+
+            .btn-success {
+                background-color: #10b981;
+                color: white;
+                border: 1px solid #10b981;
+            }
+
+            .btn-success:hover {
+                background-color: #059669;
+                border-color: #059669;
+            }
+
+            .btn-warning {
+                background-color: #f59e0b;
+                color: white;
+                border: 1px solid #f59e0b;
+            }
+
+            .btn-warning:hover {
+                background-color: #d97706;
+                border-color: #d97706;
+            }
+
+            /* User Management Styles */
+            .user-management {
+                padding: 40px 0;
+            }
+
+            .user-management-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 30px;
+            }
+
+            .user-management-title {
+                font-size: 2rem;
+                font-weight: 700;
+                color: #111827;
+            }
+
+            .search-form {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+
+            .search-form select, .search-form input {
+                padding: 8px 12px;
+                border: 1px solid #d1d5db;
+                border-radius: 6px;
+                font-size: 0.875rem;
+            }
+
+            .search-form input {
+                flex: 1;
+                min-width: 200px;
+            }
+
+            .user-table-card {
+                background-color: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                padding: 20px;
+                margin-bottom: 30px;
+            }
+
+            .user-table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .user-table th, .user-table td {
+                padding: 12px 15px;
+                text-align: left;
+                border-bottom: 1px solid #e5e7eb;
+            }
+
+            .user-table th {
+                background-color: #f9fafb;
+                font-weight: 600;
+                color: #374151;
+            }
+
+            .user-table tr:hover {
+                background-color: #f9fafb;
+            }
+
+            .user-actions {
+                display: flex;
+                gap: 5px;
+            }
+
+            .user-actions a {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 32px;
+                height: 32px;
+                border-radius: 6px;
+                color: white;
+                text-decoration: none;
+                transition: all 0.3s;
+            }
+
+            .action-view {
+                background-color: #4f46e5;
+            }
+
+            .action-view:hover {
+                background-color: #4338ca;
+            }
+
+            .action-edit {
+                background-color: #f59e0b;
+            }
+
+            .action-edit:hover {
+                background-color: #d97706;
+            }
+
+            .action-ban {
+                background-color: #ef4444;
+            }
+
+            .action-ban:hover {
+                background-color: #dc2626;
+            }
+
+            .action-unban {
+                background-color: #10b981;
+            }
+
+            .action-unban:hover {
+                background-color: #059669;
+            }
+
+            .status-badge {
+                display: inline-block;
+                padding: 4px 8px;
+                border-radius: 9999px;
+                font-size: 0.75rem;
+                font-weight: 500;
+            }
+
+            .status-active {
+                background-color: #dcfce7;
+                color: #166534;
+            }
+
+            .status-inactive {
+                background-color: #f3f4f6;
+                color: #4b5563;
+            }
+
+            .status-banned {
+                background-color: #fee2e2;
+                color: #991b1b;
+            }
+
+            .pagination {
+                display: flex;
+                justify-content: center;
+                gap: 5px;
+                margin-top: 20px;
+            }
+
+            .pagination a, .pagination span {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 36px;
+                height: 36px;
+                border-radius: 6px;
+                background-color: white;
+                border: 1px solid #d1d5db;
+                color: #4b5563;
+                text-decoration: none;
+                transition: all 0.3s;
+            }
+
+            .pagination a:hover {
+                background-color: #f3f4f6;
+            }
+
+            .pagination .active {
+                background-color: #4f46e5;
+                color: white;
+                border-color: #4f46e5;
+            }
+
+            .pagination .disabled {
+                color: #9ca3af;
+                cursor: not-allowed;
+            }
+
+            .alert {
+                padding: 12px 16px;
+                border-radius: 6px;
+                margin-bottom: 20px;
+            }
+
+            .alert-success {
+                background-color: #dcfce7;
+                color: #166534;
+                border: 1px solid #bbf7d0;
+            }
+
+            .alert-danger {
+                background-color: #fee2e2;
+                color: #991b1b;
+                border: 1px solid #fecaca;
+            }
+
+            /* Footer Styles */
+            footer {
+                background-color: #1f2937;
+                color: #f9fafb;
+                padding: 40px 0 20px;
+            }
+
+            .footer-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 40px;
+                margin-bottom: 40px;
+            }
+
+            .footer-brand {
+                grid-column: span 2;
+            }
+
+            .footer-brand .logo {
+                color: #f9fafb;
+                margin-bottom: 15px;
+            }
+
+            .footer-brand p {
+                color: #d1d5db;
+                max-width: 300px;
+            }
+
+            .footer-links h4 {
+                font-size: 1.125rem;
+                font-weight: 600;
+                margin-bottom: 15px;
+            }
+
+            .footer-links ul {
+                list-style: none;
+            }
+
+            .footer-links ul li {
+                margin-bottom: 10px;
+            }
+
+            .footer-links ul li a {
+                color: #d1d5db;
+                text-decoration: none;
+                transition: color 0.3s;
+            }
+
+            .footer-links ul li a:hover {
+                color: #f9fafb;
+            }
+
+            .footer-social h4 {
+                font-size: 1.125rem;
+                font-weight: 600;
+                margin-bottom: 15px;
+            }
+
+            .social-icons {
+                display: flex;
+                gap: 15px;
+            }
+
+            .social-icons a {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                background-color: #374151;
+                color: #f9fafb;
+                transition: all 0.3s;
+            }
+
+            .social-icons a:hover {
+                background-color: #4f46e5;
+                transform: translateY(-3px);
+            }
+
+            .footer-bottom {
+                text-align: center;
+                padding-top: 20px;
+                border-top: 1px solid #374151;
+                color: #9ca3af;
+                font-size: 0.875rem;
+            }
+
+            /* Responsive Styles */
+            @media (max-width: 992px) {
+                .sidebar {
+                    width: 70px;
+                    overflow: visible;
+                }
+
+                .sidebar .logo-text,
+                .user-details,
+                .menu-label,
+                .sidebar-menu ul li a span:not(.menu-icon) {
+                    display: none;
+                }
+
+                .sidebar-menu ul li a {
+                    justify-content: center;
+                    padding: 15px;
+                }
+
+                .menu-icon {
+                    margin-right: 0;
+                    font-size: 1.2rem;
+                }
+
+                .sidebar-footer {
+                    display: flex;
+                    justify-content: center;
+                    padding: 15px 0;
+                }
+
+                .logout-icon {
+                    margin-right: 0;
+                }
+
+                .main-content {
+                    margin-left: 70px;
+                }
+
+                .user-management-header {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 15px;
+                }
+
+                .search-form {
+                    flex-wrap: wrap;
+                }
+
+                .user-table {
+                    display: block;
+                    overflow-x: auto;
+                }
+            }
+
+            @media (max-width: 576px) {
+                .sidebar {
+                    width: 0;
+                    transform: translateX(-100%);
+                }
+
+                .sidebar.active {
+                    width: 250px;
+                    transform: translateX(0);
+                }
+
+                .sidebar.active .logo-text,
+                .sidebar.active .user-details,
+                .sidebar.active .menu-label,
+                .sidebar.active .sidebar-menu ul li a span:not(.menu-icon) {
+                    display: inline-block;
+                }
+
+                .sidebar.active .sidebar-menu ul li a {
+                    justify-content: flex-start;
+                    padding: 10px 20px;
+                }
+
+                .sidebar.active .menu-icon {
+                    margin-right: 10px;
+                    font-size: 1rem;
+                }
+
+                .mobile-toggle {
+                    display: block;
+                }
+
+                .main-content {
+                    margin-left: 0;
+                }
+
+                .search-form {
+                    flex-direction: column;
+                    width: 100%;
+                }
+            }
+        </style>
+    </head>
+    <body>
+       <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="<%=request.getContextPath()%>/admin/home" class="logo">
+                    <span class="logo-icon"><i class="fas fa-puzzle-piece"></i></span>
+                    <span class="logo-text">QuizMaster</span>
+                </a>
+            </div>
+
+            <!-- User Info -->
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                    <div class="user-name">${sessionScope.user.firstName} ${sessionScope.user.lastName}</div>
+                    <div class="user-role">${sessionScope.user.role.name}</div>
+                </div>
+            </div>
+
+            <!-- Sidebar Menu -->
+            <div class="sidebar-menu">
+                <div class="menu-label">Main</div>
+                <ul>
+                    <li>
+                        <a href="<%=request.getContextPath()%>/admin/home" class="DASHBOARD_ACTIVE">
+                            <span class="menu-icon"><i class="fas fa-tachometer-alt"></i></span>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<%=request.getContextPath()%>/admin/users" class="USERS_ACTIVE">
+                            <span class="menu-icon"><i class="fas fa-users"></i></span>
+                            Users
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<%=request.getContextPath()%>/admin/quizzes" class="QUIZZES_ACTIVE">
+                            <span class="menu-icon"><i class="fas fa-clipboard-list"></i></span>
+                            Quizzes
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<%=request.getContextPath()%>/admin/subjects" class="SUBJECTS_ACTIVE">
+                            <span class="menu-icon"><i class="fas fa-book"></i></span>
+                            Subjects
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<%=request.getContextPath()%>/admin/reports" class="REPORTS_ACTIVE">
+                            <span class="menu-icon"><i class="fas fa-chart-bar"></i></span>
+                            Reports
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="menu-label">Account</div>
+                <ul>
+                    <li>
+                        <a href="<%=request.getContextPath()%>/admin/profile" class="PROFILE_ACTIVE">
+                            <span class="menu-icon"><i class="fas fa-user-cog"></i></span>
+                            Profile
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <a href="<%=request.getContextPath()%>/signout" class="logout-btn">
+                    <span class="logout-icon"><i class="fas fa-sign-out-alt"></i></span>
+                    Logout
+                </a>
+            </div>
+        </aside>
+
+          
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Mobile Toggle Button -->
+            <div class="mobile-toggle">
+                <button id="sidebar-toggle" class="toggle-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <!-- User Management Content -->
+            <section class="user-management">
+                <div class="user-management-header">
+                    <h1 class="user-management-title">User Management</h1>
+                    <a href="<%=request.getContextPath()%>/admin/users?action=create" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i> Add New User
+                    </a>
+                </div>
+
+                <!-- Success or Error Messages -->
+                <c:if test="${not empty sessionScope.message}">
+                    <div class="alert alert-success">
+                        ${sessionScope.message}
+                        <c:remove var="message" scope="session" />
+                    </div>
+                </c:if>
+
+                <c:if test="${not empty sessionScope.error}">
+                    <div class="alert alert-danger">
+                        ${sessionScope.error}
+                        <c:remove var="error" scope="session" />
+                    </div>
+                </c:if>
+
+                <!-- Search Form -->
+                <form action="<%=request.getContextPath()%>/admin/users" method="post" class="search-form">
+                    <input type="hidden" name="action" value="search">
+                    <select name="searchBy">
+                        <option value="all" ${searchBy eq 'all' ? 'selected' : ''}>All Fields</option>
+                        <option value="username" ${searchBy eq 'username' ? 'selected' : ''}>Username</option>
+                        <option value="email" ${searchBy eq 'email' ? 'selected' : ''}>Email</option>
+                        <option value="name" ${searchBy eq 'name' ? 'selected' : ''}>Name</option>
+                    </select>
+                    <input type="text" name="searchTerm" placeholder="Search users..." value="${searchTerm}">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <c:if test="${isSearch}">
+                        <a href="<%=request.getContextPath()%>/admin/users" class="btn btn-outline">
+                            <i class="fas fa-times"></i> Clear
+                        </a>
+                    </c:if>
+                </form>
+
+                <!-- Users Table -->
+                <div class="user-table-card">
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:choose>
+                                <c:when test="${empty users}">
+                                    <tr>
+                                        <td colspan="7" style="text-align: center;">No users found</td>
+                                    </tr>
+                                </c:when>
+                                <c:otherwise>
+                                    <c:forEach var="user" items="${users}">
+                                        <tr>
+                                            <td>${user.id}</td>
+                                            <td>${user.username}</td>
+                                            <td>${user.firstName} ${user.lastName}</td>
+                                            <td>${user.emailAddress}</td>
+                                            <td>${user.role.name}</td>
+                                            <td>
+                                                <c:choose>
+                                                    <c:when test="${user.status.name eq 'Active'}">
+                                                        <span class="status-badge status-active">Active</span>
+                                                    </c:when>
+                                                    <c:when test="${user.status.name eq 'Inactive'}">
+                                                        <span class="status-badge status-inactive">Inactive</span>
+                                                    </c:when>
+                                                    <c:when test="${user.status.name eq 'Banned'}">
+                                                        <span class="status-badge status-banned">Banned</span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="status-badge status-inactive">${user.status.name}</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </td>
+                                            <td>
+                                                <div class="user-actions">
+                                                    <a href="<%=request.getContextPath()%>/admin/users?action=view&id=${user.id}" class="action-view" title="View User">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="<%=request.getContextPath()%>/admin/users?action=edit&id=${user.id}" class="action-edit" title="Edit User">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <c:choose>
+                                                        <c:when test="${user.status.name eq 'Inactive'}">
+                                                            <a href="<%=request.getContextPath()%>/admin/users?action=unban&id=${user.id}" class="action-unban" title="Activate User" onclick="return confirm('Are you sure you want to activate this user?')">
+                                                                <i class="fas fa-user-check"></i>
+                                                            </a>
+                                                        </c:when>
+                                                        <c:when test="${user.status.name eq 'Active'}">
+                                                            <a href="<%=request.getContextPath()%>/admin/users?action=ban&id=${user.id}" class="action-ban" title="Deactivate User" onclick="return confirm('Are you sure you want to deactivate this user?')">
+                                                                <i class="fas fa-user-slash"></i>
+                                                            </a>
+                                                        </c:when>
+                                                    </c:choose>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </c:otherwise>
+                            </c:choose>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <c:if test="${totalPages > 1}">
+                    <div class="pagination">
+                        <c:choose>
+                            <c:when test="${currentPage > 1}">
+                                <a href="<%=request.getContextPath()%>/admin/users?page=${currentPage - 1}${isSearch ? '&action=search&searchBy='.concat(searchBy).concat('&searchTerm=').concat(searchTerm) : ''}" title="Previous Page">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="disabled"><i class="fas fa-chevron-left"></i></span>
+                            </c:otherwise>
+                        </c:choose>
+
+                        <c:forEach begin="1" end="${totalPages}" var="i">
+                            <c:choose>
+                                <c:when test="${currentPage eq i}">
+                                    <span class="active">${i}</span>
+                                </c:when>
+                                <c:otherwise>
+                                    <a href="<%=request.getContextPath()%>/admin/users?page=${i}${isSearch ? '&action=search&searchBy='.concat(searchBy).concat('&searchTerm=').concat(searchTerm) : ''}">${i}</a>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:forEach>
+
+                        <c:choose>
+                            <c:when test="${currentPage < totalPages}">
+                                <a href="<%=request.getContextPath()%>/admin/users?page=${currentPage + 1}${isSearch ? '&action=search&searchBy='.concat(searchBy).concat('&searchTerm=').concat(searchTerm) : ''}" title="Next Page">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="disabled"><i class="fas fa-chevron-right"></i></span>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                </c:if>
+            </div>
+        </section>
+
+            <!-- Footer -->
+
+        </main>
+
+        <!-- Sidebar Toggle JavaScript -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const sidebarToggle = document.getElementById('sidebar-toggle');
+                const sidebar = document.querySelector('.sidebar');
+
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                });
+
+                // Close sidebar when clicking outside on mobile
+                document.addEventListener('click', function(event) {
+                    const isClickInsideSidebar = sidebar.contains(event.target);
+                    const isClickOnToggle = sidebarToggle.contains(event.target);
+
+                    if (!isClickInsideSidebar && !isClickOnToggle && window.innerWidth <= 576 && sidebar.classList.contains('active')) {
+                        sidebar.classList.remove('active');
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>

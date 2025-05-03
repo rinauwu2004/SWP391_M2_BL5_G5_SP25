@@ -5,6 +5,8 @@
 package vn.edu.fpt.dao;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vn.edu.fpt.model.Role;
@@ -57,5 +59,29 @@ public class RoleDao extends DBContext {
             Logger.getLogger(QuizDao.class.getName()).log(Level.SEVERE, null, ex);
         }
         return role;
+    }
+    public List<Role> getAllRoles() {
+        List<Role> roles = new ArrayList<>();
+        String sql = """
+                     SELECT [id], [name], [description]
+                     FROM [dbo].[Role]
+                     ORDER BY [id]
+                     """;
+
+        try (PreparedStatement stm = connection.prepareStatement(sql);
+             ResultSet rs = stm.executeQuery()) {
+
+            while (rs.next()) {
+                Role role = new Role();
+                role.setId(rs.getInt("id"));
+                role.setName(rs.getString("name"));
+                role.setDescription(rs.getString("description"));
+                roles.add(role);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(RoleDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return roles;
     }
 }

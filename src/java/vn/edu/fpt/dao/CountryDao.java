@@ -16,6 +16,9 @@ import vn.edu.fpt.model.Country;
  * @author Rinaaaa
  */
 public class CountryDao extends DBContext{
+    public List<Country> getAllCountries() {
+        return list();
+    }
     public List<Country> list(){
         List<Country> countries = new ArrayList<>();
         String sql = """
