@@ -14,6 +14,7 @@
         <title>My Quizzes</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
         <style>
             body {
                 background-color: #f8f9fa;
@@ -268,14 +269,16 @@
     </head>
     <body>
         <!-- Back Button -->
-        <button class="back-button" onclick="window.location.href='<%=request.getContextPath()%>/home'">
+        <button class="back-button" onclick="window.location.href = '<%=request.getContextPath()%>/home'">
             <div class="back-arrow"></div>
         </button>
 
+        <!-- Error Message -->
         <c:if test="${not empty error}">
             <p style="margin-top: 5px; color:red; text-align: center; font-size: 14px;">${error}</p>
         </c:if>
 
+        <!-- Container -->
         <div class="container">
             <div class="card">
                 <div class="card-body p-4">
@@ -324,7 +327,7 @@
                                                 </c:otherwise>
                                             </c:choose>
                                         </td>
-                                        <td>${quiz.createdAt}</td>
+                                        <td><fmt:formatDate value="${quiz.createdAt}" pattern="dd/MM/yyyy HH:mm" /></td>
                                         <td>
                                             <button class="action-btn view" title="View">
                                                 <i class="fas fa-eye"></i>
@@ -363,10 +366,10 @@
             </div>
         </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Script -->
         <script>
             // JavaScript for Delete Confirmation Modal
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 // Get the modal
                 const modal = document.getElementById('deleteConfirmationModal');
 
@@ -401,11 +404,11 @@
 
                 // Add click event to all delete buttons
                 deleteButtons.forEach(button => {
-                    button.addEventListener('click', function(e) {
+                    button.addEventListener('click', function (e) {
                         e.preventDefault();
                         // Get the quiz ID from data attribute or parent row
-                        const quizId = this.getAttribute('data-quiz-id') || 
-                                      this.closest('tr').getAttribute('data-quiz-id');
+                        const quizId = this.getAttribute('data-quiz-id') ||
+                                this.closest('tr').getAttribute('data-quiz-id');
                         openModal(quizId);
                     });
                 });
@@ -417,7 +420,7 @@
                 cancelButton.addEventListener('click', closeModal);
 
                 // Handle the delete confirmation
-                confirmDeleteButton.addEventListener('click', function() {
+                confirmDeleteButton.addEventListener('click', function () {
                     if (quizToDelete) {
                         // Submit the delete form or make an AJAX request
                         // Example:
@@ -428,28 +431,28 @@
 
                         // Or using fetch API for AJAX:
                         /*
-                        fetch('<%=request.getContextPath()%>/quiz/delete?id=' + quizToDelete, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            }
-                        })
-                        .then(response => {
-                            if (response.ok) {
-                                // Reload the page or remove the row from the table
-                                window.location.reload();
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
-                        */
+                         fetch('<%=request.getContextPath()%>/quiz/delete?id=' + quizToDelete, {
+                         method: 'POST',
+                         headers: {
+                         'Content-Type': 'application/json',
+                         }
+                         })
+                         .then(response => {
+                         if (response.ok) {
+                         // Reload the page or remove the row from the table
+                         window.location.reload();
+                         }
+                         })
+                         .catch(error => {
+                         console.error('Error:', error);
+                         });
+                         */
                     }
                     closeModal();
                 });
 
                 // Close the modal if the user clicks outside of it
-                window.addEventListener('click', function(event) {
+                window.addEventListener('click', function (event) {
                     if (event.target === modal) {
                         closeModal();
                     }

@@ -67,7 +67,7 @@ public class QuizDao extends DBContext {
         return quiz;
     }
 
-    public Quiz get(String input) {
+    public Quiz get(String code) {
         UserDao userDao = new UserDao();
         Quiz quiz = null;
         String sql = """
@@ -75,11 +75,10 @@ public class QuizDao extends DBContext {
                             [description], [code], [timeLimit],
                             [status], [createdAt]
                      FROM [Quiz]
-                     WHERE [code] = ? OR [title] = ? 
-                     """;
+                     WHERE [code] = ?
+                     """;   
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setString(1, input);
-            stm.setString(2, input);
+            stm.setString(1, code);
             ResultSet rs = stm.executeQuery();
             if (rs.next()) {
                 quiz = new Quiz();
