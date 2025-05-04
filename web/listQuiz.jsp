@@ -273,7 +273,12 @@
             <div class="back-arrow"></div>
         </button>
 
-        <!-- Error Message -->
+        <!-- Message -->
+        <c:if test="${not empty sessionScope.successMessage}">
+            <p style="margin-top: 5px; color:green; text-align: center; font-size: 14px;">${sessionScope.successMessage}</p>
+            <c:remove var="successMessage" scope="session"/>
+        </c:if>
+        
         <c:if test="${not empty error}">
             <p style="margin-top: 5px; color:red; text-align: center; font-size: 14px;">${error}</p>
         </c:if>
