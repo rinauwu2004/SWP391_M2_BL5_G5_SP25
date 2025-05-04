@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import vn.edu.fpt.model.Question;
 import vn.edu.fpt.model.Quiz;
 
 /**
@@ -60,6 +61,8 @@ public class QuizDao extends DBContext {
                 quiz.setTimeLimit(rs.getInt("timeLimit"));
                 quiz.setStatus(rs.getString("status"));
                 quiz.setCreatedAt(rs.getTimestamp("createdAt"));
+
+                // Không tải questions ở đây để tránh làm chậm
             }
         } catch (SQLException ex) {
             Logger.getLogger(QuizDao.class.getName()).log(Level.SEVERE, null, ex);
@@ -76,7 +79,7 @@ public class QuizDao extends DBContext {
                             [status], [createdAt]
                      FROM [Quiz]
                      WHERE [code] = ?
-                     """;   
+                     """;
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setString(1, code);
             ResultSet rs = stm.executeQuery();
@@ -90,6 +93,8 @@ public class QuizDao extends DBContext {
                 quiz.setTimeLimit(rs.getInt("timeLimit"));
                 quiz.setStatus(rs.getString("status"));
                 quiz.setCreatedAt(rs.getTimestamp("createdAt"));
+
+                // Không tải questions ở đây để tránh làm chậm
             }
         } catch (SQLException ex) {
             Logger.getLogger(QuizDao.class.getName()).log(Level.SEVERE, null, ex);
@@ -119,6 +124,8 @@ public class QuizDao extends DBContext {
                 quiz.setTimeLimit(rs.getInt("timeLimit"));
                 quiz.setStatus(rs.getString("status"));
                 quiz.setCreatedAt(rs.getTimestamp("createdAt"));
+
+                // Không tải questions ở đây để tránh làm chậm
                 quizzes.add(quiz);
             }
         } catch (SQLException ex) {
@@ -134,6 +141,15 @@ public class QuizDao extends DBContext {
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next();
             }
+        }
+    }
+
+    // Thêm phương thức mới để tải questions cho một quiz cụ thể khi cần
+    public void loadQuestionsForQuiz(Quiz quiz) {
+        if (quiz != null) {
+            QuestionDao questionDao = new QuestionDao();
+            List<Question> questions = questionDao.getQuestionsByQuizId(quiz.getId());
+            quiz.setQuestions(questions);
         }
     }
 }

@@ -5,6 +5,8 @@
 package vn.edu.fpt.dao;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vn.edu.fpt.model.Question;
@@ -14,7 +16,7 @@ import vn.edu.fpt.model.Question;
  * @author Rinaaaa
  */
 public class QuestionDao extends DBContext {
-    
+
     public void create(Question question) {
         String sql = """
                      INSERT INTO [Question] ([quizId], [content]) VALUES (?, ?)
@@ -27,7 +29,7 @@ public class QuestionDao extends DBContext {
             Logger.getLogger(QuestionDao.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public Question get(String input) {
         QuizDao quizDao = new QuizDao();
         Question question = null;
@@ -49,5 +51,53 @@ public class QuestionDao extends DBContext {
             Logger.getLogger(QuestionDao.class.getName()).log(Level.SEVERE, null, ex);
         }
         return question;
+    }
+
+    public Question getQuestionById(int id) {
+        QuizDao quizDao = new QuizDao();
+        Question question = null;
+        String sql = """
+                 SELECT [id], [quizId], [content]
+                 FROM [Question]
+                 WHERE [id] = ?
+                 """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, id);
+            ResultSet rs = stm.executeQuery();
+            if (rs.next()) {
+                question = new Question();
+                question.setId(rs.getInt("id"));
+                question.setQuiz(quizDao.get(rs.getInt("quizId")));
+                question.setContent(rs.getNString("content"));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(QuestionDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return question;
+    }
+
+    public List<Question> getQuestionsByQuizId(int quizId) {
+        List<Question> questions = new ArrayList<>();
+        QuizDao quizDao = new QuizDao();
+        String sql = """
+                 SELECT [id], [quizId], [content]
+                 FROM [Question]
+                 WHERE [quizId] = ?
+                 ORDER BY [id]
+                 """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, quizId);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                Question question = new Question();
+                question.setId(rs.getInt("id"));
+                question.setQuiz(quizDao.get(rs.getInt("quizId")));
+                question.setContent(rs.getNString("content"));
+                questions.add(question);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(QuestionDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return questions;
     }
 }

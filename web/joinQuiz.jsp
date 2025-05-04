@@ -101,9 +101,9 @@
         <div class="card">
             <h1>Join Quiz</h1>
             <p class="description">Enter the quiz code provided by your teacher</p>
-            
+
             <c:if test="${not empty errorMessage}">
-                <p style="margin-top: 5px; color:red; text-align: center; font-size: 14px;">$errorMessage}</p>
+                <p style="margin-top: 5px; color:red; text-align: center; font-size: 14px;">${errorMessage}</p>
             </c:if>
 
             <form action="<%=request.getContextPath()%>/quiz/join" method="post">
@@ -115,5 +115,11 @@
                 </button>
             </form>
         </div>
+
+        <script>
+            document.getElementById('quizCode').addEventListener('input', function () {
+                this.value = this.value.replace(/[^a-zA-Z0-9]/g, '');
+            });
+        </script>        
     </body>
 </html>

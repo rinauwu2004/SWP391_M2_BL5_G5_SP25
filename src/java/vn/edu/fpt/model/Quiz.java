@@ -5,6 +5,8 @@
 package vn.edu.fpt.model;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -19,6 +21,16 @@ public class Quiz {
     private int timeLimit;
     private String status;
     private Timestamp createdAt;
+    
+    private List<Question> questions = new ArrayList<>();
+
+    public List<Question> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(List<Question> questions) {
+        this.questions = questions;
+    }
 
     public int getId() {
         return id;
