@@ -541,10 +541,10 @@
                             <span><i class="fas fa-calendar-alt"></i> Created on <fmt:formatDate value="${quiz.createdAt}" pattern="MMM dd, yyyy" /></span>
                             <span>
                                 <c:choose>
-                                    <c:when test="${quiz.status eq 'active'}">
+                                    <c:when test="${quiz.status eq 'Active'}">
                                         <span class="status-badge status-active">Active</span>
                                     </c:when>
-                                    <c:when test="${quiz.status eq 'inactive'}">
+                                    <c:when test="${quiz.status eq 'Inactive'}">
                                         <span class="status-badge status-inactive">Inactive</span>
                                     </c:when>
                                     <c:otherwise>
@@ -624,17 +624,18 @@
                                 <table class="attempts-table">
                                     <thead>
                                         <tr>
+                                            <th>#</th>
                                             <th>Student</th>
                                             <th>Started</th>
                                             <th>Submitted</th>
-                                            <th>Duration</th>
                                             <th>Score</th>
                                             <th>Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <c:forEach var="attempt" items="${attempts}">
+                                        <c:forEach var="attempt" items="${attempts}" varStatus="loop">
                                             <tr>
+                                                <td>${loop.count}</td>
                                                 <td>${attempt.student.firstName} ${attempt.student.lastName}</td>
                                                 <td><fmt:formatDate value="${attempt.startedTime}" pattern="MMM dd, yyyy HH:mm" /></td>
                                                 <td>
@@ -647,7 +648,6 @@
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </td>
-                                                <td>${attempt.formattedDuration}</td>
                                                 <td class="score-cell 
                                                     <c:choose>
                                                         <c:when test="${attempt.score >= 0.8}">high-score</c:when>
@@ -657,7 +657,7 @@
                                                 ">
                                                     <c:choose>
                                                         <c:when test="${attempt.submittedTime != null}">
-                                                            ${attempt.scorePercentage}
+                                                            ${attempt.score}
                                                         </c:when>
                                                         <c:otherwise>
                                                             -
@@ -665,14 +665,7 @@
                                                     </c:choose>
                                                 </td>
                                                 <td>
-                                                    <c:choose>
-                                                        <c:when test="${attempt.status eq 'Completed'}">
-                                                            <span class="status-completed">Completed</span>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <span class="status-in-progress">In Progress</span>
-                                                        </c:otherwise>
-                                                    </c:choose>
+                                                    -
                                                 </td>
                                             </tr>
                                         </c:forEach>

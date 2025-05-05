@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
+import vn.edu.fpt.dao.QuizAttemptDao;
 import vn.edu.fpt.dao.QuizDao;
 import vn.edu.fpt.model.Quiz;
 import vn.edu.fpt.model.QuizAttempt;
@@ -70,21 +71,14 @@ public class QuizResultsServlet extends HttpServlet {
             }
             
             // For now, we'll use empty data since the database table might not be ready
-            List<QuizAttempt> attempts = new ArrayList<>();
+            QuizAttemptDao quizAttemptDao = new QuizAttemptDao();
+            List<QuizAttempt> attempts = quizAttemptDao.getByQuiz(quizId);
             int questionCount = quizDao.countQuestionsByQuizId(quizId);
-            int completedAttemptsCount = 0;
-            int inProgressAttemptsCount = 0;
-            float averageScore = 0.0f;
-            float highestScore = 0.0f;
 
             // Set attributes for the JSP
             request.setAttribute("quiz", quiz);
             request.setAttribute("attempts", attempts);
-            request.setAttribute("questionCount", questionCount);
-            request.setAttribute("completedAttemptsCount", completedAttemptsCount);
-            request.setAttribute("inProgressAttemptsCount", inProgressAttemptsCount);
-            request.setAttribute("averageScore", averageScore);
-            request.setAttribute("highestScore", highestScore);
+            request.setAttribute("questionCount", attempts.size());
             
             // Forward to the quiz results JSP
             request.getRequestDispatcher("/teachers/quizResults.jsp").forward(request, response);
