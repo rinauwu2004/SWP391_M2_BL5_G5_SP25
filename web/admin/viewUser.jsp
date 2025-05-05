@@ -65,11 +65,14 @@
             }
 
             .user-info {
-                display: flex;
+                display: grid;
+                grid-template-columns: auto 1fr;
                 align-items: center;
                 padding: 15px 20px;
                 border-bottom: 1px solid #374151;
+                column-gap: 10px;
             }
+
 
             .user-avatar {
                 width: 40px;
@@ -707,249 +710,236 @@
         </style>
     </head>
     <body>
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <a href="<%=request.getContextPath()%>/admin/home" class="logo">
-                    <span class="logo-icon"><i class="fas fa-puzzle-piece"></i></span>
-                    <span class="logo-text">QuizMaster</span>
-                </a>
-            </div>
-
-            <!-- User Info -->
-            <div class="user-info">
-                <div class="user-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="user-details">
-                    <div class="user-name">${sessionScope.user.firstName} ${sessionScope.user.lastName}</div>
-                    <div class="user-role">${sessionScope.user.role.name}</div>
-                </div>
-            </div>
-
-           <aside class="sidebar">
-            <div class="sidebar-header">
-                <a href="<%=request.getContextPath()%>/admin/home" class="logo">
-                    <span class="logo-icon"><i class="fas fa-puzzle-piece"></i></span>
-                    <span class="logo-text">QuizMaster</span>
-                </a>
-            </div>
-
-            <!-- User Info -->
-            <div class="user-info">
-                <div class="user-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="user-details">
-                    <div class="user-name">${sessionScope.user.firstName} ${sessionScope.user.lastName}</div>
-                    <div class="user-role">${sessionScope.user.role.name}</div>
-                </div>
-            </div>
-
-            <!-- Sidebar Menu -->
-            <div class="sidebar-menu">
-                <div class="menu-label">Main</div>
-                <ul>
-                    <li>
-                        <a href="<%=request.getContextPath()%>/admin/home" class="DASHBOARD_ACTIVE">
-                            <span class="menu-icon"><i class="fas fa-tachometer-alt"></i></span>
-                            Dashboard
+        <c:choose>
+            <c:when test="${user == null}">
+                <div style="color: red; font-weight: bold; padding: 20px;">User not found or invalid user ID.</div>
+            </c:when>
+            <c:otherwise>
+                <!-- Sidebar -->
+                <aside class="sidebar">
+                    <div class="sidebar-header">
+                        <a href="<%=request.getContextPath()%>/admin/home" class="logo">
+                            <span class="logo-icon"><i class="fas fa-puzzle-piece"></i></span>
+                            <span class="logo-text">QuizMaster</span>
                         </a>
-                    </li>
-                    <li>
-                        <a href="<%=request.getContextPath()%>/admin/users" class="USERS_ACTIVE">
-                            <span class="menu-icon"><i class="fas fa-users"></i></span>
-                            Users
-                        </a>
-                    </li>
-                    <li>
-                        <a href="<%=request.getContextPath()%>/admin/quizzes" class="QUIZZES_ACTIVE">
-                            <span class="menu-icon"><i class="fas fa-clipboard-list"></i></span>
-                            Quizzes
-                        </a>
-                    </li>
-                    <li>
-                        <a href="<%=request.getContextPath()%>/admin/subjects" class="SUBJECTS_ACTIVE">
-                            <span class="menu-icon"><i class="fas fa-book"></i></span>
-                            Subjects
-                        </a>
-                    </li>
-                    <li>
-                        <a href="<%=request.getContextPath()%>/admin/reports" class="REPORTS_ACTIVE">
-                            <span class="menu-icon"><i class="fas fa-chart-bar"></i></span>
-                            Reports
-                        </a>
-                    </li>
-                </ul>
-
-                <div class="menu-label">Account</div>
-                <ul>
-                    <li>
-                        <a href="<%=request.getContextPath()%>/admin/profile" class="PROFILE_ACTIVE">
-                            <span class="menu-icon"><i class="fas fa-user-cog"></i></span>
-                            Profile
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Sidebar Footer -->
-            <div class="sidebar-footer">
-                <a href="<%=request.getContextPath()%>/signout" class="logout-btn">
-                    <span class="logout-icon"><i class="fas fa-sign-out-alt"></i></span>
-                    Logout
-                </a>
-            </div>
-        </aside>
-
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Mobile Toggle Button -->
-            <div class="mobile-toggle">
-                <button id="sidebar-toggle" class="toggle-btn">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-
-            <!-- View User Content -->
-            <section class="view-user-section">
-                <div class="view-user-header">
-                    <h1 class="view-user-title">User Profile</h1>
-                    <div class="view-user-actions">
-                        <a href="<%=request.getContextPath()%>/admin/users" class="btn btn-outline">
-                            <i class="fas fa-arrow-left"></i> Back to Users
-                        </a>
-                        <a href="<%=request.getContextPath()%>/admin/users?action=edit&id=${user.id}" class="btn btn-primary">
-                            <i class="fas fa-edit"></i> Edit User
-                        </a>
-                        <c:choose>
-                            <c:when test="${user.status.name eq 'Inactive'}">
-                                <a href="<%=request.getContextPath()%>/admin/users?action=unban&id=${user.id}" class="btn btn-success" onclick="return confirm('Are you sure you want to activate this user?')">
-                                    <i class="fas fa-user-check"></i> Activate User
-                                </a>
-                            </c:when>
-                            <c:when test="${user.status.name eq 'Active'}">
-                                <a href="<%=request.getContextPath()%>/admin/users?action=ban&id=${user.id}" class="btn btn-danger" onclick="return confirm('Are you sure you want to deactivate this user?')">
-                                    <i class="fas fa-user-slash"></i> Deactivate User
-                                </a>
-                            </c:when>
-                        </c:choose>
                     </div>
-                </div>
 
-                <!-- User Profile Card -->
-                <div class="user-profile-card">
-                    <div class="user-profile-header">
+                    <!-- User Info -->
+                    <div class="user-info">
                         <div class="user-avatar">
                             <i class="fas fa-user"></i>
                         </div>
-                        <div class="user-info">
-                            <h2 class="user-name">${user.firstName} ${user.lastName}</h2>
-                            <p class="user-username">@${user.username}</p>
-                            <c:choose>
-                                <c:when test="${user.status.name eq 'Active'}">
-                                    <span class="user-status status-active">Active</span>
-                                </c:when>
-                                <c:when test="${user.status.name eq 'Inactive'}">
-                                    <span class="user-status status-inactive">Inactive</span>
-                                </c:when>
-                                <c:otherwise>
-                                    <span class="user-status status-inactive">${user.status.name}</span>
-                                </c:otherwise>
-                            </c:choose>
+                        <div class="user-details">
+                            <div class="user-name">${sessionScope.user.firstName} ${sessionScope.user.lastName}</div>
+                            <div class="user-role">${sessionScope.user.role.name}</div>
                         </div>
                     </div>
 
-                    <div class="user-details">
-                        <div>
-                            <div class="detail-group">
-                                <div class="detail-label">Email Address</div>
-                                <div class="detail-value">${user.emailAddress}</div>
-                            </div>
+                    <!-- Sidebar Menu -->
+                    <div class="sidebar-menu">
+                        <div class="menu-label">Main</div>
+                        <ul>
+                            <li>
+                                <a href="<%=request.getContextPath()%>/admin/home" class="DASHBOARD_ACTIVE">
+                                    <span class="menu-icon"><i class="fas fa-tachometer-alt"></i></span>
+                                    Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <a href="<%=request.getContextPath()%>/admin/users" class="USERS_ACTIVE">
+                                    <span class="menu-icon"><i class="fas fa-users"></i></span>
+                                    Users
+                                </a>
+                            </li>
+                            <li>
+                                <a href="<%=request.getContextPath()%>/admin/quizzes" class="QUIZZES_ACTIVE">
+                                    <span class="menu-icon"><i class="fas fa-clipboard-list"></i></span>
+                                    Quizzes
+                                </a>
+                            </li>
+                            <li>
+                                <a href="<%=request.getContextPath()%>/admin/subjects" class="SUBJECTS_ACTIVE">
+                                    <span class="menu-icon"><i class="fas fa-book"></i></span>
+                                    Subjects
+                                </a>
+                            </li>
+                            <li>
+                                <a href="<%=request.getContextPath()%>/admin/reports" class="REPORTS_ACTIVE">
+                                    <span class="menu-icon"><i class="fas fa-chart-bar"></i></span>
+                                    Reports
+                                </a>
+                            </li>
+                        </ul>
 
-                            <div class="detail-group">
-                                <div class="detail-label">Phone Number</div>
-                                <div class="detail-value">${not empty user.phoneNumber ? user.phoneNumber : 'Not provided'}</div>
-                            </div>
-
-                            <div class="detail-group">
-                                <div class="detail-label">Date of Birth</div>
-                                <div class="detail-value"><fmt:formatDate value="${user.dob}" pattern="MMMM dd, yyyy" /></div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="detail-group">
-                                <div class="detail-label">Role</div>
-                                <div class="detail-value">${user.role.name}</div>
-                            </div>
-
-                            <div class="detail-group">
-                                <div class="detail-label">Country</div>
-                                <div class="detail-value">${user.country.name}</div>
-                            </div>
-
-                            <div class="detail-group">
-                                <div class="detail-label">Address</div>
-                                <div class="detail-value">${not empty user.address ? user.address : 'Not provided'}</div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="detail-group">
-                                <div class="detail-label">Account Created</div>
-                                <div class="detail-value"><fmt:formatDate value="${user.createdAt}" pattern="MMMM dd, yyyy 'at' hh:mm a" /></div>
-                            </div>
-
-                            <div class="detail-group">
-                                <div class="detail-label">User ID</div>
-                                <div class="detail-value">${user.id}</div>
-                            </div>
-                        </div>
+                        <div class="menu-label">Account</div>
+                        <ul>
+                            <li>
+                                <a href="<%=request.getContextPath()%>/admin/profile" class="PROFILE_ACTIVE">
+                                    <span class="menu-icon"><i class="fas fa-user-cog"></i></span>
+                                    Profile
+                                </a>
+                            </li>
+                        </ul>
                     </div>
-                </div>
 
-                <!-- User Activity Card -->
-                <div class="user-activity-card">
-                    <h3 class="user-activity-title">Recent Activity</h3>
+                    <!-- Sidebar Footer -->
+                    <div class="sidebar-footer">
+                        <a href="<%=request.getContextPath()%>/signout" class="logout-btn">
+                            <span class="logout-icon"><i class="fas fa-sign-out-alt"></i></span>
+                            Logout
+                        </a>
+                    </div>
+                </aside>
 
-                    <ul class="activity-list">
-                        <li class="activity-item">
-                            <div class="activity-icon">
-                                <i class="fas fa-sign-in-alt"></i>
+                <!-- Main Content -->
+                <main class="main-content">
+                    <!-- Mobile Toggle Button -->
+                    <div class="mobile-toggle">
+                        <button id="sidebar-toggle" class="toggle-btn">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                    </div>
+
+                    <!-- View User Content -->
+                    <section class="view-user-section">
+                        <div class="view-user-header">
+                            <h1 class="view-user-title">User Profile</h1>
+                            <div class="view-user-actions">
+                                <a href="<%=request.getContextPath()%>/admin/users" class="btn btn-outline">
+                                    <i class="fas fa-arrow-left"></i> Back to Users
+                                </a>
+                                <a href="<%=request.getContextPath()%>/admin/users?action=edit&id=${user.id}" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i> Edit User
+                                </a>
+                                <c:choose>
+                                    <c:when test="${user.status.name eq 'Inactive'}">
+                                        <a href="<%=request.getContextPath()%>/admin/users?action=unban&id=${user.id}" class="btn btn-success" onclick="return confirm('Are you sure you want to activate this user?')">
+                                            <i class="fas fa-user-check"></i> Activate User
+                                        </a>
+                                    </c:when>
+                                    <c:when test="${user.status.name eq 'Active'}">
+                                        <a href="<%=request.getContextPath()%>/admin/users?action=ban&id=${user.id}" class="btn btn-danger" onclick="return confirm('Are you sure you want to deactivate this user?')">
+                                            <i class="fas fa-user-slash"></i> Deactivate User
+                                        </a>
+                                    </c:when>
+                                </c:choose>
                             </div>
-                            <div class="activity-content">
-                                <div class="activity-text">User account created</div>
-                                <div class="activity-time"><fmt:formatDate value="${user.createdAt}" pattern="MMMM dd, yyyy 'at' hh:mm a" /></div>
-                            </div>
-                        </li>
-                        <!-- More activity items would be added here from the database -->
-                    </ul>
-                </div>
-            </section>
+                        </div>
 
-            <!-- Footer -->
-            <footer>
-                <div class="footer-bottom">
-                    <p>&copy; <c:set var="now" value="<%= new java.util.Date() %>" />
-                        <fmt:formatDate value="${now}" pattern="yyyy" /> QuizMaster. All rights reserved.</p>
-                </div>
-            </footer>
-        </main>
+                        <!-- User Profile Card -->
+                        <div class="user-profile-card">
+                            <div class="user-profile-header">
+                                <div class="user-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="user-info">
+                                    <h2 class="user-name">${user.firstName} ${user.lastName}</h2>
+                                    <p class="user-username">@${user.username}</p>
+                                    <c:choose>
+                                        <c:when test="${user.status.name eq 'Active'}">
+                                            <span class="user-status status-active">Active</span>
+                                        </c:when>
+                                        <c:when test="${user.status.name eq 'Inactive'}">
+                                            <span class="user-status status-inactive">Inactive</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="user-status status-inactive">${user.status.name}</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+                            </div>
+
+                            <div class="user-details">
+                                <div>
+                                    <div class="detail-group">
+                                        <div class="detail-label">Email Address</div>
+                                        <div class="detail-value">${user.emailAddress}</div>
+                                    </div>
+
+                                    <div class="detail-group">
+                                        <div class="detail-label">Phone Number</div>
+                                        <div class="detail-value">${not empty user.phoneNumber ? user.phoneNumber : 'Not provided'}</div>
+                                    </div>
+
+                                    <div class="detail-group">
+                                        <div class="detail-label">Date of Birth</div>
+                                        <div class="detail-value"><fmt:formatDate value="${user.dob}" pattern="MMMM dd, yyyy" /></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="detail-group">
+                                        <div class="detail-label">Role</div>
+                                        <div class="detail-value">${user.role.name}</div>
+                                    </div>
+
+                                    <div class="detail-group">
+                                        <div class="detail-label">Country</div>
+                                        <div class="detail-value">${user.country.name}</div>
+                                    </div>
+
+                                    <div class="detail-group">
+                                        <div class="detail-label">Address</div>
+                                        <div class="detail-value">${not empty user.address ? user.address : 'Not provided'}</div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="detail-group">
+                                        <div class="detail-label">Account Created</div>
+                                        <div class="detail-value"><fmt:formatDate value="${user.createdAt}" pattern="MMMM dd, yyyy 'at' hh:mm a" /></div>
+                                    </div>
+
+                                    <div class="detail-group">
+                                        <div class="detail-label">User ID</div>
+                                        <div class="detail-value">${user.id}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- User Activity Card -->
+                        <div class="user-activity-card">
+                            <h3 class="user-activity-title">Recent Activity</h3>
+
+                            <ul class="activity-list">
+                                <li class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-sign-in-alt"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="activity-text">User account created</div>
+                                        <div class="activity-time"><fmt:formatDate value="${user.createdAt}" pattern="MMMM dd, yyyy 'at' hh:mm a" /></div>
+                                    </div>
+                                </li>
+                                <!-- More activity items would be added here from the database -->
+                            </ul>
+                        </div>
+                    </section>
+
+                    <!-- Footer -->
+                    <footer>
+                        <div class="footer-bottom">
+                            <p>&copy; <c:set var="now" value="<%= new java.util.Date() %>" />
+                                <fmt:formatDate value="${now}" pattern="yyyy" /> QuizMaster. All rights reserved.</p>
+                        </div>
+                    </footer>
+                </main>
+            </c:otherwise>
+        </c:choose>
 
         <!-- Sidebar Toggle JavaScript -->
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 const sidebarToggle = document.getElementById('sidebar-toggle');
                 const sidebar = document.querySelector('.sidebar');
 
-                sidebarToggle.addEventListener('click', function() {
+                sidebarToggle.addEventListener('click', function () {
                     sidebar.classList.toggle('active');
                 });
 
                 // Close sidebar when clicking outside on mobile
-                document.addEventListener('click', function(event) {
+                document.addEventListener('click', function (event) {
                     const isClickInsideSidebar = sidebar.contains(event.target);
                     const isClickOnToggle = sidebarToggle.contains(event.target);
 

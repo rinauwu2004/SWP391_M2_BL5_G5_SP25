@@ -27,53 +27,52 @@
             /* Sidebar Styles */
             .sidebar {
                 width: 250px;
-                background-color: #2c3e50;
-                color: #ecf0f1;
-                display: flex;
-                flex-direction: column;
+                background-color: #1f2937;
+                color: #f9fafb;
                 position: fixed;
                 height: 100vh;
                 overflow-y: auto;
-                transition: all 0.3s ease;
+                transition: all 0.3s;
+                z-index: 1000;
             }
 
             .sidebar-header {
                 padding: 20px;
-                background-color: #1a2530;
-                text-align: center;
+                border-bottom: 1px solid #374151;
             }
 
-            .logo {
+            .sidebar .logo {
                 display: flex;
                 align-items: center;
-                justify-content: center;
-                text-decoration: none;
-                color: #ecf0f1;
+                font-weight: 700;
                 font-size: 1.5rem;
-                font-weight: bold;
+                color: #f9fafb;
+                text-decoration: none;
+                margin-bottom: 10px;
             }
 
-            .logo-icon {
-                margin-right: 10px;
+            .sidebar .logo-icon {
+                margin-right: 8px;
                 font-size: 1.8rem;
-                color: #3498db;
             }
 
             .user-info {
                 display: flex;
                 align-items: center;
-                padding: 20px;
-                border-bottom: 1px solid #34495e;
+                padding: 15px 20px;
+                border-bottom: 1px solid #374151;
             }
 
             .user-avatar {
                 width: 40px;
                 height: 40px;
                 border-radius: 50%;
-                background-color: #3498db;
+                background-color: #4f46e5;
+                color: white;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                font-size: 1.2rem;
                 margin-right: 10px;
             }
 
@@ -82,55 +81,55 @@
             }
 
             .user-name {
-                font-weight: bold;
+                font-weight: 500;
+                color: #f9fafb;
                 font-size: 0.9rem;
             }
 
             .user-role {
+                color: #9ca3af;
                 font-size: 0.8rem;
-                color: #bdc3c7;
             }
 
             .sidebar-menu {
                 padding: 20px 0;
-                flex: 1;
             }
 
             .menu-label {
                 padding: 0 20px;
-                margin-bottom: 10px;
-                font-size: 0.8rem;
-                color: #bdc3c7;
+                font-size: 0.75rem;
                 text-transform: uppercase;
-                letter-spacing: 1px;
+                color: #9ca3af;
+                margin-bottom: 10px;
+                letter-spacing: 0.05em;
             }
 
             .sidebar-menu ul {
                 list-style: none;
             }
 
-            .sidebar-menu li {
+            .sidebar-menu ul li {
                 margin-bottom: 5px;
             }
 
-            .sidebar-menu a {
+            .sidebar-menu ul li a {
                 display: flex;
                 align-items: center;
-                padding: 12px 20px;
+                padding: 10px 20px;
+                color: #d1d5db;
                 text-decoration: none;
-                color: #ecf0f1;
-                font-size: 0.9rem;
-                transition: all 0.3s ease;
+                transition: all 0.3s;
+                font-weight: 500;
             }
 
-            .sidebar-menu a:hover {
-                background-color: #34495e;
+            .sidebar-menu ul li a:hover {
+                background-color: #374151;
+                color: #f9fafb;
             }
 
-            .sidebar-menu a.active {
-                background-color: #3498db;
-                color: #fff;
-                border-left: 4px solid #2980b9;
+            .sidebar-menu ul li a.active {
+                background-color: #4f46e5;
+                color: #f9fafb;
             }
 
             .menu-icon {
@@ -139,6 +138,30 @@
                 text-align: center;
             }
 
+            .sidebar-footer {
+                padding: 15px 20px;
+                border-top: 1px solid #374151;
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+            }
+
+            .logout-btn {
+                display: flex;
+                align-items: center;
+                color: #d1d5db;
+                text-decoration: none;
+                transition: color 0.3s;
+                font-weight: 500;
+            }
+
+            .logout-btn:hover {
+                color: #f9fafb;
+            }
+
+            .logout-icon {
+                margin-right: 10px;
+            }
             /* Main Content Styles */
             .main-content {
                 flex: 1;

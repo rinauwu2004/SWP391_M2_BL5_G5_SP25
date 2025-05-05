@@ -182,7 +182,7 @@ public class AdminUserManagementServlet extends HttpServlet {
         // Get user ID from request parameter
         String userIdParam = request.getParameter("id");
         if (userIdParam == null || userIdParam.isEmpty()) {
-            response.sendRedirect(request.getContextPath() + "/admin/users");
+            response.sendRedirect(request.getContextPath() + "/admin/users ");
             return;
         }
 
