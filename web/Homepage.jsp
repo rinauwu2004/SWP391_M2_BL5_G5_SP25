@@ -69,7 +69,7 @@
                     <div class="hero-text">
                         <h1>Test Your Knowledge with Fun Quizzes</h1>
                         <p>Challenge yourself with thousands of quizzes across various categories. Learn, compete, and have fun!</p>
-                        <a href="quizzes.jsp" class="btn btn-primary">
+                        <a href="<%=request.getContextPath()%>/quiz/join" class="btn btn-primary">
                             Start Quiz Now
                             <i class="fas fa-arrow-right"></i>
                         </a>

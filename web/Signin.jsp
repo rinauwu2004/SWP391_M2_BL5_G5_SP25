@@ -260,13 +260,20 @@
         <button class="back-button" onclick="window.history.back()">
             <div class="back-arrow"></div>
         </button>
-        
+
         <div class="signin-container">
             <div class="signin-header">
                 <h1>Sign in</h1>
                 <p>Enter your credentials to access your account</p>
                 <c:if test="${not empty message}">
                     <p style="margin-top: 5px; color:green; text-align: center; font-size: 14px;">${message}</p>
+                </c:if>
+
+                <c:if test="${not empty sessionScope.error}">
+                    <p style="margin-top: 5px; color:red; text-align: center; font-size: 14px;">
+                        ${sessionScope.error}
+                    </p>
+                    <c:remove var="error" scope="session"/> <!-- Xóa sau khi hiển thị -->
                 </c:if>
             </div>
 
@@ -293,7 +300,7 @@
                             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                             </svg>
                         </span>
-                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                        <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="" required>
                     </div>
                 </div>
 
@@ -336,7 +343,7 @@
                 Don't have an account? <a href="<%=request.getContextPath()%>/signup-role?purpose=signup">Sign up</a>
             </div>
 
-            <c:if test="${not empty error}">
+            <c:if test="${not empty requestScope.error}">
                 <p style="margin-top: 5px; color:red; text-align: center; font-size: 14px;">${error}</p>
             </c:if>
         </div>

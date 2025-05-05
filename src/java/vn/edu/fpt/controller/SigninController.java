@@ -10,7 +10,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import vn.edu.fpt.dao.UserDao;
 import vn.edu.fpt.model.User;
 import static vn.edu.fpt.util.PasswordEncryption.checkPassword;

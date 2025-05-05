@@ -60,7 +60,7 @@ public class TeacherHomeServlet extends HttpServlet {
         }
         
         request.setAttribute("quizzes", quizzes);
-        request.getRequestDispatcher("/teachers/home.jsp").forward(request, response);
+        request.getRequestDispatcher("../teachers/home.jsp").forward(request, response);
     }
 
     /**
