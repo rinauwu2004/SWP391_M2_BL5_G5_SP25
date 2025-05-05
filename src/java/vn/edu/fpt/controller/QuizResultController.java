@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.util.stream.Collectors;
 import vn.edu.fpt.dao.QuestionDao;
 import vn.edu.fpt.dao.QuizAttemptDao;
 import vn.edu.fpt.dao.QuizAttemptDetailDao;

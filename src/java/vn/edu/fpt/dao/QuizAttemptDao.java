@@ -6,7 +6,9 @@ package vn.edu.fpt.dao;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vn.edu.fpt.model.QuizAttempt;
@@ -259,5 +261,95 @@ public class QuizAttemptDao extends DBContext {
             Logger.getLogger(QuizAttemptDao.class.getName()).log(Level.SEVERE, null, ex);
         }
         return attempts;
+    }
+
+    /**
+     * Gets the attempt number for a specific quiz attempt This calculates which
+     * attempt number this is for the student for this specific quiz
+     *
+     * @param attemptId The ID of the quiz attempt
+     * @return The attempt number (1 for first attempt, 2 for second, etc.)
+     */
+    public int getAttemptNumber(int attemptId) {
+        int attemptNumber = 0;
+        String sql = """
+                 SELECT COUNT(*) as attempt_number
+                 FROM [QuizAttempt] a1
+                 JOIN [QuizAttempt] a2 ON a1.[studentId] = a2.[studentId] AND a1.[quizId] = a2.[quizId]
+                 WHERE a2.[id] = ? AND (a1.[startedTime] < a2.[startedTime] OR 
+                       (a1.[startedTime] = a2.[startedTime] AND a1.[id] <= a2.[id]))
+                 """;
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, attemptId);
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    attemptNumber = rs.getInt("attempt_number");
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(QuizAttemptDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return attemptNumber;
+    }
+
+    /**
+     * Gets a map of attempt numbers for a list of attempt IDs This is more
+     * efficient than calling getAttemptNumber multiple times
+     *
+     * @param studentId The ID of the student
+     * @param attemptIds List of attempt IDs to get numbers for
+     * @return Map of attempt ID to attempt number
+     */
+    public Map<Integer, Integer> getAttemptNumbers(int studentId, List<Integer> attemptIds) {
+        Map<Integer, Integer> attemptNumbers = new HashMap<>();
+
+        if (attemptIds == null || attemptIds.isEmpty()) {
+            return attemptNumbers;
+        }
+
+        // Build the IN clause for the SQL query
+        StringBuilder placeholders = new StringBuilder();
+        for (int i = 0; i < attemptIds.size(); i++) {
+            placeholders.append("?");
+            if (i < attemptIds.size() - 1) {
+                placeholders.append(",");
+            }
+        }
+
+        String sql = String.format("""
+                 WITH AttemptRanking AS (
+                     SELECT 
+                         a.[id],
+                         a.[quizId],
+                         ROW_NUMBER() OVER (PARTITION BY a.[quizId] ORDER BY a.[startedTime], a.[id]) as attempt_number
+                     FROM [QuizAttempt] a
+                     WHERE a.[studentId] = ? AND a.[id] IN (%s)
+                 )
+                 SELECT [id], [attempt_number]
+                 FROM AttemptRanking
+                 """, placeholders);
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, studentId);
+
+            // Set the attempt IDs in the IN clause
+            for (int i = 0; i < attemptIds.size(); i++) {
+                stm.setInt(i + 2, attemptIds.get(i));
+            }
+
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    int attemptId = rs.getInt("id");
+                    int attemptNumber = rs.getInt("attempt_number");
+                    attemptNumbers.put(attemptId, attemptNumber);
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(QuizAttemptDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return attemptNumbers;
     }
 }

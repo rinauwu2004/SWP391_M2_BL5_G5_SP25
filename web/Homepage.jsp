@@ -30,8 +30,8 @@
                     <nav>
                         <ul>
                             <li><a href="<%=request.getContextPath()%>/home">Home</a></li>
-                            <li><a href="<%=request.getContextPath()%>/quiz/list">Quizzes</a></li>
-                            <li><a href="categories.jsp">Categories</a></li>
+                            <li><a href="<%=request.getContextPath()%>/quiz/history">Quizzes</a></li>
+                            <li><a href="#">Categories</a></li>
                             <li><a href="#footer-section">About</a></li>
                         </ul>
                     </nav>
@@ -161,7 +161,7 @@
                         <p>Test your coding knowledge</p>
                         <div class="quiz-footer">
                             <span>20 Questions</span>
-                            <a href="quiz.jsp?id=1" class="btn btn-primary">Start Quiz</a>
+                            <a href="#" class="btn btn-primary">Start Quiz</a>
                         </div>
                     </div>
                     <div class="quiz-card">
@@ -172,7 +172,7 @@
                         <p>Learn about our planet</p>
                         <div class="quiz-footer">
                             <span>15 Questions</span>
-                            <a href="quiz.jsp?id=2" class="btn btn-success">Start Quiz</a>
+                            <a href="#" class="btn btn-success">Start Quiz</a>
                         </div>
                     </div>
                     <div class="quiz-card">
@@ -183,7 +183,7 @@
                         <p>Explore historical events</p>
                         <div class="quiz-footer">
                             <span>25 Questions</span>
-                            <a href="quiz.jsp?id=3" class="btn btn-primary">Start Quiz</a>
+                            <a href="#" class="btn btn-primary">Start Quiz</a>
                         </div>
                     </div>
                 </div>
@@ -191,16 +191,18 @@
         </section>
 
         <!-- Call to Action -->
-        <section class="cta">
-            <div class="container">
-                <h2>Ready to Test Your Knowledge?</h2>
-                <p>Join thousands of users and start your learning journey today!</p>
-                <a href="<%=request.getContextPath()%>/signup" class="btn btn-light">
-                    Create Free Account
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-        </section>
+        <c:if test="empty ${user}">
+            <section class="cta">
+                <div class="container">
+                    <h2>Ready to Test Your Knowledge?</h2>
+                    <p>Join thousands of users and start your learning journey today!</p>
+                    <a href="<%=request.getContextPath()%>/signup-role?purpose=signup" class="btn btn-light">
+                        Create Free Account
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </section>
+        </c:if>
 
         <!-- Footer -->
         <footer id="footer-section">
@@ -216,19 +218,19 @@
                     <div class="footer-links">
                         <h4>Quick Links</h4>
                         <ul>
-                            <li><a href="index.jsp">Home</a></li>
-                            <li><a href="about.jsp">About Us</a></li>
-                            <li><a href="categories.jsp">Categories</a></li>
-                            <li><a href="contact.jsp">Contact</a></li>
+                            <li><a href="<%=request.getContextPath()%>/home">Home</a></li>
+                            <li><a href="#footer-section">About Us</a></li>
+                            <li><a href="#">Categories</a></li>
+                            <li><a href="#">Contact</a></li>
                         </ul>
                     </div>
                     <div class="footer-links">
                         <h4>Categories</h4>
                         <ul>
-                            <li><a href="category.jsp?id=tech">Technology</a></li>
-                            <li><a href="category.jsp?id=science">Science</a></li>
-                            <li><a href="category.jsp?id=arts">Arts</a></li>
-                            <li><a href="category.jsp?id=geo">Geography</a></li>
+                            <li><a href="#">Technology</a></li>
+                            <li><a href="#">Science</a></li>
+                            <li><a href="#">Arts</a></li>
+                            <li><a href="#">Geography</a></li>
                         </ul>
                     </div>
                     <div class="footer-social">
