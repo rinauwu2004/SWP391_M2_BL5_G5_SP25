@@ -537,7 +537,7 @@
                         <div class="quiz-results-meta">
                             <span><i class="fas fa-clock"></i> ${quiz.timeLimit} minutes</span>
                             <span><i class="fas fa-question-circle"></i> ${questionCount} questions</span>
-                            <span><i class="fas fa-users"></i> ${completedAttemptsCount + inProgressAttemptsCount} attempts</span>
+                            <span><i class="fas fa-users"></i> ${attemptCount} attempts</span>
                             <span><i class="fas fa-calendar-alt"></i> Created on <fmt:formatDate value="${quiz.createdAt}" pattern="MMM dd, yyyy" /></span>
                             <span>
                                 <c:choose>

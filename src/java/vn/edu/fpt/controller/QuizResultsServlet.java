@@ -78,7 +78,8 @@ public class QuizResultsServlet extends HttpServlet {
             // Set attributes for the JSP
             request.setAttribute("quiz", quiz);
             request.setAttribute("attempts", attempts);
-            request.setAttribute("questionCount", attempts.size());
+            request.setAttribute("attemptCount", attempts.size());
+            request.setAttribute("questionCount", questionCount);
             
             // Forward to the quiz results JSP
             request.getRequestDispatcher("/teachers/quizResults.jsp").forward(request, response);
