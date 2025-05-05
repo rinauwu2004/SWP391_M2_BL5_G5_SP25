@@ -442,7 +442,6 @@
                         <ul>
                             <li><a href="<%=request.getContextPath()%>/home">Home</a></li>
                             <li><a href="<%=request.getContextPath()%>/teacher/home" class="active">Dashboard</a></li>
-                            <li><a href="<%=request.getContextPath()%>/quiz/create">Create Quiz</a></li>
                         </ul>
                     </nav>
                     <div class="auth-buttons">
