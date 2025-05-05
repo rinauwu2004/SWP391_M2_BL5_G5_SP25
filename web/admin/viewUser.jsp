@@ -890,10 +890,7 @@
                                         <div class="detail-value"><fmt:formatDate value="${user.createdAt}" pattern="MMMM dd, yyyy 'at' hh:mm a" /></div>
                                     </div>
 
-                                    <div class="detail-group">
-                                        <div class="detail-label">User ID</div>
-                                        <div class="detail-value">${user.id}</div>
-                                    </div>
+                                    
                                 </div>
                             </div>
                         </div>

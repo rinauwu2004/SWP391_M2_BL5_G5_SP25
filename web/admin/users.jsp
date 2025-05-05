@@ -787,7 +787,7 @@
                     <table class="user-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                
                                 <th>Username</th>
                                 <th>Name</th>
                                 <th>Email</th>
@@ -806,7 +806,7 @@
                                 <c:otherwise>
                                     <c:forEach var="user" items="${users}">
                                         <tr>
-                                            <td>${user.id}</td>
+                                            
                                             <td>${user.username}</td>
                                             <td>${user.firstName} ${user.lastName}</td>
                                             <td>${user.emailAddress}</td>

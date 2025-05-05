@@ -433,15 +433,15 @@
             <div class="container">
                 <div class="navbar">
                     <div class="logo">
-                        <a href="<%=request.getContextPath()%>/home">
+                        <a href="<%=request.getContextPath()%>/teacher/home">
                             <span class="logo-icon"><i class="fas fa-puzzle-piece"></i></span>
                             <span class="logo-text">QuizMaster</span>
                         </a>
                     </div>
                     <nav>
                         <ul>
-                            <li><a href="<%=request.getContextPath()%>/home">Home</a></li>
-                            <li><a href="<%=request.getContextPath()%>/teacher/home" class="active">Dashboard</a></li>
+                            <li><a href="<%=request.getContextPath()%>/teacher/home">Home</a></li>
+                            
                         </ul>
                     </nav>
                     <div class="auth-buttons">
