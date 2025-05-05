@@ -321,26 +321,27 @@ public class SubjectDAO extends DBContext {
             throw new RuntimeException("Error deleting subject", e);
         }
     }
-    
+
     public boolean deactivateSubjectById(int id) {
-    String query = "UPDATE [Subject] SET [status] = 0, [modified_at] = GETDATE() WHERE [id] = ?";
+        String query = "UPDATE [Subject] SET [status] = 0, [modified_at] = GETDATE() WHERE [id] = ?";
 
-    try (Connection conn = new DBContext().connection;
-         PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = new DBContext().connection; PreparedStatement stmt = conn.prepareStatement(query)) {
 
-        if (conn == null || conn.isClosed()) {
-            LOGGER.log(Level.SEVERE, "Database connection is null or closed");
-            throw new SQLException("Invalid database connection");
+            if (conn == null || conn.isClosed()) {
+                LOGGER.log(Level.SEVERE, "Database connection is null or closed");
+                throw new SQLException("Invalid database connection");
+            }
+
+            stmt.setInt(1, id);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error deactivating subject with ID {0}: {1}", new Object[]{id, e.getMessage()});
+            throw new RuntimeException("Error deactivating subject", e);
         }
-
-        stmt.setInt(1, id);
-        int rowsAffected = stmt.executeUpdate();
-        return rowsAffected > 0;
-
-    } catch (SQLException e) {
-        LOGGER.log(Level.SEVERE, "Error deactivating subject with ID {0}: {1}", new Object[]{id, e.getMessage()});
-        throw new RuntimeException("Error deactivating subject", e);
     }
+
     public List<Subject> getAllSubjects() {
         List<Subject> subjects = new ArrayList<>();
         String sql = """
@@ -349,8 +350,7 @@ public class SubjectDAO extends DBContext {
                      ORDER BY [name]
                      """;
 
-        try (PreparedStatement stm = connection.prepareStatement(sql);
-             ResultSet rs = stm.executeQuery()) {
+        try (PreparedStatement stm = connection.prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
 
             while (rs.next()) {
                 Subject subject = new Subject();
@@ -370,13 +370,11 @@ public class SubjectDAO extends DBContext {
         return subjects;
     }
 
-
     public int countAllSubjects() {
         int count = 0;
         String sql = "SELECT COUNT(*) AS subjectCount FROM [Subject]";
 
-        try (PreparedStatement stm = connection.prepareStatement(sql);
-             ResultSet rs = stm.executeQuery()) {
+        try (PreparedStatement stm = connection.prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
 
             if (rs.next()) {
                 count = rs.getInt("subjectCount");
@@ -392,8 +390,7 @@ public class SubjectDAO extends DBContext {
         int count = 0;
         String sql = "SELECT COUNT(*) AS subjectCount FROM [Subject] WHERE [status] = 1";
 
-        try (PreparedStatement stm = connection.prepareStatement(sql);
-             ResultSet rs = stm.executeQuery()) {
+        try (PreparedStatement stm = connection.prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
 
             if (rs.next()) {
                 count = rs.getInt("subjectCount");
@@ -409,8 +406,7 @@ public class SubjectDAO extends DBContext {
         List<String> subjectNames = new ArrayList<>();
         String sql = "SELECT [name] FROM [Subject] WHERE [status] = 1 ORDER BY [name]";
 
-        try (PreparedStatement stm = connection.prepareStatement(sql);
-             ResultSet rs = stm.executeQuery()) {
+        try (PreparedStatement stm = connection.prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
 
             while (rs.next()) {
                 subjectNames.add(rs.getString("name"));
@@ -630,7 +626,6 @@ public class SubjectDAO extends DBContext {
         }
     }
 }
-
 
 //    public static void main(String[] args) {
 //        SubjectDAO sdao = new SubjectDAO();
