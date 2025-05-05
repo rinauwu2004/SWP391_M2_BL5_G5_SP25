@@ -1,3 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context path="/SWP391_M2_BL5_G5_SP25">
+  <Environment name="GOOGLE_CLIENT_SECRET" type="java.lang.String" value="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"/>
 </Context>

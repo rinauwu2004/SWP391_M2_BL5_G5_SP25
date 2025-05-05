@@ -503,7 +503,7 @@
                     <div class="stat-icon icon-questions">
                         <i class="fas fa-question"></i>
                     </div>
-                    <div class="stat-value">-</div>
+                    <div class="stat-value">${questionCount}</div>
                     <div class="stat-label">Questions</div>
                 </div>
                 <div class="stat-card">
@@ -571,7 +571,13 @@
                     <!-- Questions Section -->
                     <div class="quiz-section">
                         <h3 class="section-title">Questions</h3>
-                        <p>Questions information is not available in admin view.</p>
+                        <c:if test="${not empty quiz.questions}">
+                            <ol>
+                                <c:forEach var="question" items="${quiz.questions}">
+                                    <li>${question.content}</li>
+                                    </c:forEach>
+                            </ol>
+                        </c:if>
                     </div>
                 </div>
             </div>

@@ -527,7 +527,7 @@
 
                         <div class="form-group">
                             <label for="email" class="form-label">Email Address</label>
-                            <input type="email" id="email" class="form-control" value="${formData.email}" readonly>
+                            <input type="email" id="email" class="form-control" value="${formData.email}" disabled>
                             <small>Email address cannot be changed</small>
                         </div>
 

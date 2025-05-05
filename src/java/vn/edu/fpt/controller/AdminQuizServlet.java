@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import vn.edu.fpt.dao.QuestionDao;
 import vn.edu.fpt.dao.QuizDao;
 import vn.edu.fpt.model.Quiz;
 import vn.edu.fpt.model.User;
@@ -171,6 +172,9 @@ public class AdminQuizServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/admin/quizzes");
                 return;
             }
+            
+            QuestionDao questionDao = new QuestionDao();
+            quiz.setQuestions(questionDao.getQuestionsByQuizId(quizId));
 
             // Get quiz statistics
             int attemptCount = quizDao.countAttemptsByQuizId(quizId);
@@ -178,6 +182,7 @@ public class AdminQuizServlet extends HttpServlet {
             // Set attributes for the JSP
             request.setAttribute("quiz", quiz);
             request.setAttribute("attemptCount", attemptCount);
+            request.setAttribute("questionCount", quizDao.countQuestionsByQuizId(quizId));
 
             // Forward to the view quiz JSP
             request.getRequestDispatcher("/admin/viewQuiz.jsp").forward(request, response);
