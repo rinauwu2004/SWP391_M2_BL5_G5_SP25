@@ -5,13 +5,23 @@
         <group>
             <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/controller/QuizResultsServlet.java</file>
             <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/dao/SubjectDAO.java</file>
-            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/controller/RemoveMessageServlet.java</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/web/admin/viewQuiz.jsp</file>
             <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/web/admin/profile.jsp</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/dao/DBContext.java</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/web/admin/subjects.jsp</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/dao/UserDao.java</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/web/admin/viewUser.jsp</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/controller/RemoveMessageServlet.java</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/web/admin/quizzes.jsp</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/web/admin/users.jsp</file>
             <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/controller/SigninController.java</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/web/admin/viewSubject.jsp</file>
             <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/web/WEB-INF/web.xml</file>
             <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/dao/RoleDao.java</file>
             <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/web/login.jsp</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/controller/AdminSubjectServlet.java</file>
             <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/web/admin/home.jsp</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/controller/AdminUserManagementServlet.java</file>
         </group>
     </open-files>
 </project-private>

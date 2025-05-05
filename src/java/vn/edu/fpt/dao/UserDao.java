@@ -179,13 +179,12 @@ public class UserDao extends DBContext {
         RoleDao roleDao = new RoleDao();
         UserStatusDao userStatusDao = new UserStatusDao();
         User user = null;
-        String sql = """
-                 SELECT [id], [username], [password_hash], [password_salt],
-                        [first_name], [last_name], [date_of_birth],
-                        [country_id], [phone_number], [email_address], [address],
-                        [status_id], [role_id], [created_at]
-                 FROM [User] WHERE [id] = ?
-                 """;
+        String sql = "SELECT [id], [username], [password_hash], [password_salt],\n" +
+"                        [first_name], [last_name], [date_of_birth],\n" +
+"                        [country_id], [phone_number], [email_address], [address],\n" +
+"                        [status_id], [role_id], [created_at]\n" +
+"                 FROM [User] WHERE [id] = ?";
+              
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, userId);
             ResultSet rs = stm.executeQuery();
