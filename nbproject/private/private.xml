@@ -3,9 +3,15 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/FPT/FULearning/Spring25/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/dao/SubjectDAO.java</file>
-            <file>file:/E:/FPT/FULearning/Spring25/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/controller/AdminHomeServlet.java</file>
-            <file>file:/E:/FPT/FULearning/Spring25/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/dao/QuizDao.java</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/controller/QuizResultsServlet.java</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/dao/SubjectDAO.java</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/controller/RemoveMessageServlet.java</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/web/admin/profile.jsp</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/controller/SigninController.java</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/web/WEB-INF/web.xml</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/src/java/vn/edu/fpt/dao/RoleDao.java</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/web/login.jsp</file>
+            <file>file:/D:/Chuyen%20nganh/SWP391/SWP391_M2_BL5_G5_SP25/web/admin/home.jsp</file>
         </group>
     </open-files>
 </project-private>
