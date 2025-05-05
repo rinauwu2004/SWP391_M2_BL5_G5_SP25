@@ -11,7 +11,6 @@ public class Answer {
     private String content;
     private boolean isCorrect;
 
-    // Thêm trường để lưu questionId trực tiếp
     private int questionId;
 
     public int getId() {

@@ -78,8 +78,8 @@ public class CreateQuestionController extends HttpServlet {
                 Question question = new Question();
                 question.setQuiz(quiz);
                 question.setContent(questionContent);
-                questionDao.create(question);
-                question = questionDao.get(questionContent);
+                int questionId = questionDao.create(question);
+                question.setId(questionId);
 
                 List<AnswerTemp> answerList = answers.get(questionKey);
                 if (answerList != null) {
@@ -93,10 +93,10 @@ public class CreateQuestionController extends HttpServlet {
                 }
             }
             request.getSession().setAttribute("successMessage", "Quiz created successfully!");
-            response.sendRedirect(request.getContextPath() + "/quiz/list");
+            response.sendRedirect(request.getContextPath() + "/teacher/home");
         } catch (IOException ex) {
             Logger.getLogger(CreateQuestionController.class.getName()).log(Level.SEVERE, null, ex);
-            response.sendRedirect(request.getContextPath() + "/quiz/list?error=error_create_question");
+            response.sendRedirect(request.getContextPath() + "/teacher/home?error=error_create_question");
         }
     }
     

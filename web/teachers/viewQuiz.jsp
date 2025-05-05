@@ -516,7 +516,6 @@
                         <ul>
                             <li><a href="<%=request.getContextPath()%>/home">Home</a></li>
                             <li><a href="<%=request.getContextPath()%>/teacher/home">Dashboard</a></li>
-                            <li><a href="<%=request.getContextPath()%>/quiz/create">Create Quiz</a></li>
                         </ul>
                     </nav>
                     <div class="auth-buttons">
@@ -549,10 +548,10 @@
                             <span><i class="fas fa-key"></i> Quiz Code: ${quiz.code}</span>
                             <span>
                                 <c:choose>
-                                    <c:when test="${quiz.status eq 'active'}">
+                                    <c:when test="${quiz.status eq 'Active'}">
                                         <span class="status-badge status-active">Active</span>
                                     </c:when>
-                                    <c:when test="${quiz.status eq 'inactive'}">
+                                    <c:when test="${quiz.status eq 'Inactive'}">
                                         <span class="status-badge status-inactive">Inactive</span>
                                     </c:when>
                                     <c:otherwise>

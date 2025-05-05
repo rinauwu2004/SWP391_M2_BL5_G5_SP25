@@ -226,7 +226,6 @@ public class QuestionDao extends DBContext {
                      FROM [Question] q
                      LEFT JOIN [Answer] a ON q.[id] = a.[questionId]
                      WHERE q.[quizId] = ?
-                     ORDER BY q.[id], a.[id]
                      """;
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, quizId);

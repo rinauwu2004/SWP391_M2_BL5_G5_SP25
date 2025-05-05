@@ -500,10 +500,10 @@
                                             <span><i class="fas fa-clock"></i> ${quiz.timeLimit} min</span>
                                             <span>
                                                 <c:choose>
-                                                    <c:when test="${quiz.status eq 'active'}">
+                                                    <c:when test="${quiz.status eq 'Active'}">
                                                         <span class="status-badge status-active">Active</span>
                                                     </c:when>
-                                                    <c:when test="${quiz.status eq 'inactive'}">
+                                                    <c:when test="${quiz.status == 'Inactive'}">
                                                         <span class="status-badge status-inactive">Inactive</span>
                                                     </c:when>
                                                     <c:otherwise>

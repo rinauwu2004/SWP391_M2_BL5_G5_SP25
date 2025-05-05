@@ -427,12 +427,16 @@ public class QuizDao extends DBContext {
      */
     public int create(Quiz quiz) {
         String sql = """
-                     INSERT INTO [dbo].[Quiz]( 
-                        [teacherId] ,[title] ,[description],
-                        [code], [timeLimit], [status])
-                     VALUES (?, ?, ?, ?, ?, ?)
-                     """;
+                 INSERT INTO [dbo].[Quiz]( 
+                    [teacherId] ,[title] ,[description],
+                    [code], [timeLimit], [status])
+                 VALUES (?, ?, ?, ?, ?, ?)
+                 """;
         try (PreparedStatement stm = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            if (quiz.getTeacher() == null) {
+                throw new IllegalArgumentException("Teacher cannot be null when creating a quiz");
+            }
+
             stm.setInt(1, quiz.getTeacher().getId());
             stm.setNString(2, quiz.getTitle());
             stm.setNString(3, quiz.getDescription());
@@ -447,7 +451,6 @@ public class QuizDao extends DBContext {
                     int id = rs.getInt(1);
                     quiz.setId(id);
 
-                    // Xóa cache liên quan
                     clearCacheForTeacher(quiz.getTeacher().getId());
 
                     return id;

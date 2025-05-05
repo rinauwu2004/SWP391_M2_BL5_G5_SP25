@@ -335,7 +335,7 @@
                                         <fmt:formatDate value="${quiz.createdAt}" pattern="dd/MM/yyyy HH:mm" />
                                     </c:when>
                                     <c:otherwise>
-                                        <c:set var="now" value="${pageContext.request.time}" />
+                                        <c:set var="now" value="${requestScope.time}" />
                                         <fmt:formatDate value="${now}" pattern="dd/MM/yyyy HH:mm" />
                                     </c:otherwise>
                                 </c:choose>
