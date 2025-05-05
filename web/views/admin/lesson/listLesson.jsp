@@ -172,9 +172,9 @@
         </style>
     </head>
     <body>
-        
-        
-         <div class="notification">
+
+
+        <div class="notification">
             <c:import url="../../../notification.jsp" />
         </div>
 
@@ -199,7 +199,7 @@
                     <option value="1">Active</option>
                     <option value="0">Inactive</option>
                 </select>
-                <button type="submit">Apply</button>
+                <button type="submit">Search</button>
             </form>
 
 
@@ -215,7 +215,7 @@
                 <tbody>
                     <c:forEach var="lesson" items="${listLesson}">
                         <tr>
-                            <td>LSN${lesson.id}</td>
+                            <td>${lesson.id}</td>
                             <td>${lesson.name}</td>
                             <td>
                                 <span class="status ${lesson.status == 1 ? 'active' : 'inactive'}">
@@ -226,12 +226,12 @@
                                 <a href="lesson-view-detail?id=${lesson.id}">
                                     <button class="action-btn"><i class="fas fa-eye"></i></button>
                                 </a>
-                                <a href="lesson-edit?id=${lesson.id}">
+                                <a href="lesson-edit?id=${lesson.id}&subjectId=${param.id}">
                                     <button class="action-btn"><i class="fas fa-pen text-success"></i></button>
                                 </a>
-<button class="action-btn text-danger" onclick="confirmDelete(${lesson.id})">
-        <i class="fas fa-trash"></i>
-    </button>
+                                <button class="action-btn text-danger" onclick="confirmDelete(${lesson.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
 
                                 <a href="module-list?id=${lesson.id}">
                                     <button class="view-btn">View Module</button>
@@ -265,21 +265,19 @@
                     </c:if>
                 </div>
             </div>
-                
-                
-                
-                
-                
-                <script>
-    function confirmDelete(lessonId) {
-        if (confirm("Are you sure you want to delete this lesson?")) {
-            // Nếu người dùng xác nhận, tiến hành xóa
-            window.location.href = "lesson-delete?id=" + lessonId +"&subjectId=${param.id}";
-        }
-    }
-</script>
 
 
+
+
+
+            <script>
+                function confirmDelete(lessonId) {
+                    if (confirm("Are you sure you want to delete this lesson?")) {
+                        // Nếu người dùng xác nhận, tiến hành xóa
+                        window.location.href = "lesson-delete?id=" + lessonId + "&subjectId=${param.id}";
+                    }
+                }
+            </script>
         </div>
     </body>
 </html>

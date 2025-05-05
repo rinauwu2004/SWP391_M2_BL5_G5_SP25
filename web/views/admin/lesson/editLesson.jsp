@@ -130,6 +130,8 @@
             <h2>Edit Lesson</h2>
             <form action="lesson-edit" method="post">
                 <input type="hidden" name="id" value="${lesson.id}" />
+                <input type="hidden" name="subjectId" value="${param.subjectId}" />
+
 
                 <div class="form-group">
                     <label for="lessonName">Lesson Name</label>

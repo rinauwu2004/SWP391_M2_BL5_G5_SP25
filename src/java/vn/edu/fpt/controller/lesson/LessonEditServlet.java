@@ -87,6 +87,8 @@ public class LessonEditServlet extends HttpServlet {
 
             if (isUpdate) {
                 session.setAttribute("message", "Edit lesson successfully.");
+                            response.sendRedirect("viewLesson?id=" + request.getParameter("subjectId"));
+return;
             } else {
                 session.setAttribute("error", "Edit lesson false.");
 
