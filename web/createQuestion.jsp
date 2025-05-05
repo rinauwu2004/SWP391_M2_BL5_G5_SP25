@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -13,7 +14,7 @@
                 background-color: #f9fafb;
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             }
-            
+
             .back-button {
                 position: absolute;
                 top: 20px;
@@ -77,22 +78,79 @@
                 color: #1f2937;
             }
 
-            .import-btn {
-                background-color: #eff6ff;
-                color: #2563eb;
-                border: none;
-                border-radius: 6px;
-                padding: 0.75rem 1rem;
+            .mt-3 {
+                max-width: 500px;
+                margin: 20px auto;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                background-color: #fff;
+            }
+
+            .form-control {
+                display: block;
                 width: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 0.5rem;
-                transition: background-color 0.2s;
+                padding: 10px 12px;
+                margin-bottom: 15px !important;
+                font-size: 14px;
+                line-height: 1.5;
+                color: #495057;
+                background-color: #f8f9fa;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+                transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            }
+
+            .form-control:focus {
+                border-color: #80bdff;
+                outline: 0;
+                box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            }
+
+            .import-btn {
+                display: inline-block;
+                font-weight: 500;
+                text-align: center;
+                white-space: nowrap;
+                vertical-align: middle;
+                user-select: none;
+                border: 1px solid transparent;
+                padding: 10px 20px;
+                font-size: 14px;
+                line-height: 1.5;
+                border-radius: 4px;
+                color: #fff;
+                background-color: #28a745;
+                border-color: #28a745;
+                transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+                    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+                cursor: pointer;
+                width: 100%;
             }
 
             .import-btn:hover {
-                background-color: #dbeafe;
+                background-color: #218838;
+                border-color: #1e7e34;
+            }
+
+            .import-btn:focus {
+                box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.5);
+                outline: 0;
+            }
+
+            input[type="file"]::file-selector-button {
+                margin-right: 10px;
+                border: none;
+                background: #e9ecef;
+                padding: 8px 16px;
+                border-radius: 4px;
+                color: #495057;
+                cursor: pointer;
+                transition: background .2s ease-in-out;
+            }
+
+            input[type="file"]::file-selector-button:hover {
+                background: #dde0e3;
             }
 
             .question-panel {
@@ -224,7 +282,14 @@
         <button class="back-button" onclick="window.history.back()">
             <div class="back-arrow"></div>
         </button>
-        
+
+        <!-- Add Save Quiz button at the top -->
+        <div style="position: absolute; top:  2rem; right: 1.5rem;">
+            <button type="button" class="btn btn-primary" onclick="document.getElementById('quizForm').submit();">
+                Save Quiz
+            </button>
+        </div>
+
         <div class="quiz-container">
             <div class="row g-4">
                 <!-- Left Column - Quiz Information -->
@@ -270,20 +335,23 @@
                                         <fmt:formatDate value="${quiz.createdAt}" pattern="dd/MM/yyyy HH:mm" />
                                     </c:when>
                                     <c:otherwise>
-                                        <fmt:formatDate value="<%= new java.util.Date() %>" pattern="dd/MM/yyyy HH:mm" />
+                                        <c:set var="now" value="${pageContext.request.time}" />
+                                        <fmt:formatDate value="${now}" pattern="dd/MM/yyyy HH:mm" />
                                     </c:otherwise>
                                 </c:choose>
                             </div>
                         </div>
 
-                        <div class="mt-4">
-                            <button class="import-btn">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-upload" viewBox="0 0 16 16">
-                                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                                <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
-                                </svg>
-                                Import from file (.docx)
-                            </button>
+                        <div class="quiz-info-item" style="margin-top: 2.5rem;">
+                            <div class="quiz-info-label">Import Question</div>
+                            <c:if test="${not empty error}">
+                                <p style="margin-top: 0.5rem; color:red; text-align: center; font-size: 14px;">${error}</p>
+                            </c:if>
+                            <form action="${pageContext.request.contextPath}/quiz/importDocx" method="post" enctype="multipart/form-data" class="mt-3">
+                                <input type="hidden" id="quizId" name="quizId" value="${quiz.id}">
+                                <input type="file" name="file" accept=".docx" class="form-control mb-2" required>
+                                <button type="submit" class="import-btn">Import from file (.docx)</button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -293,69 +361,89 @@
                     <form id="quizForm" action="<%=request.getContextPath()%>/quiz/createQuestion" method="post">
                         <input type="hidden" id="quiz" name="quiz" value="${quiz.id}">
                         <div id="questionsContainer">
-                            <!-- Question 1 -->
-                            <div class="question-panel" data-question-id="1">
-                                <div class="question-header">Question 1</div>
-                                <button type="button" class="delete-btn delete-question-btn" onclick="deleteQuestion(this)">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-                                    </svg>
-                                </button>
-                                <input type="text" name="question_1" class="question-input" placeholder="Enter your question here">
 
-                                <div class="answers-container">
-                                    <!-- Answer 1 -->
-                                    <div class="answer-item">
-                                        <input type="checkbox" name="correct_1_1" class="answer-checkbox" id="answer_1_1">
-                                        <input type="text" name="answer_1_1" class="answer-input" placeholder="Enter answer option 1">
-                                        <button type="button" class="delete-btn" onclick="deleteAnswer(this)">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                                            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-                                            </svg>
-                                        </button>
+                            <c:if test="${not empty importedQuestions}">
+                                <c:forEach var="q" items="${importedQuestions}" varStatus="qStatus">
+                                    <div class="question-panel" data-question-id="${qStatus.index + 1}">
+                                        <div class="question-header">Question ${qStatus.index + 1}</div>
+                                        <input type="text" name="question_${qStatus.index + 1}" class="question-input" value="${q.content}">
+
+                                        <div class="answers-container">
+                                            <c:forEach var="a" items="${q.answers}" varStatus="aStatus">
+                                                <div class="answer-item">
+                                                    <input type="checkbox" name="correct_${qStatus.index + 1}_${aStatus.index + 1}" class="answer-checkbox" <c:if test="${a.isCorrect}">checked</c:if>>
+                                                    <input type="text" name="answer_${qStatus.index + 1}_${aStatus.index + 1}" class="answer-input" value="${a.content}">
+                                                </div>
+                                            </c:forEach>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                            </c:if>
+
+                            <c:if test="${empty importedQuestions}">
+                                <div class="question-panel" data-question-id="1">
+                                    <div class="question-header">Question 1</div>
+                                    <button type="button" class="delete-btn delete-question-btn" onclick="deleteQuestion(this)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                        </svg>
+                                    </button>
+                                    <input type="text" name="question_1" class="question-input" placeholder="Enter your question here">
+
+                                    <div class="answers-container">
+                                        <!-- Answer 1 -->
+                                        <div class="answer-item">
+                                            <input type="checkbox" name="correct_1_1" class="answer-checkbox" id="answer_1_1">
+                                            <input type="text" name="answer_1_1" class="answer-input" placeholder="Enter answer option 1">
+                                            <button type="button" class="delete-btn" onclick="deleteAnswer(this)">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        <!-- Answer 2 -->
+                                        <div class="answer-item">
+                                            <input type="checkbox" name="correct_1_2" class="answer-checkbox" id="answer_1_2">
+                                            <input type="text" name="answer_1_2" class="answer-input" placeholder="Enter answer option 2">
+                                            <button type="button" class="delete-btn" onclick="deleteAnswer(this)">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        <!-- Answer 3 -->
+                                        <div class="answer-item">
+                                            <input type="checkbox" name="correct_1_3" class="answer-checkbox" id="answer_1_3">
+                                            <input type="text" name="answer_1_3" class="answer-input" placeholder="Enter answer option 3">
+                                            <button type="button" class="delete-btn" onclick="deleteAnswer(this)">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        <!-- Answer 4 -->
+                                        <div class="answer-item">
+                                            <input type="checkbox" name="correct_1_4" class="answer-checkbox" id="answer_1_4">
+                                            <input type="text" name="answer_1_4" class="answer-input" placeholder="Enter answer option 4">
+                                            <button type="button" class="delete-btn" onclick="deleteAnswer(this)">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </div>
 
-                                    <!-- Answer 2 -->
-                                    <div class="answer-item">
-                                        <input type="checkbox" name="correct_1_2" class="answer-checkbox" id="answer_1_2">
-                                        <input type="text" name="answer_1_2" class="answer-input" placeholder="Enter answer option 2">
-                                        <button type="button" class="delete-btn" onclick="deleteAnswer(this)">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                                            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-                                            </svg>
-                                        </button>
-                                    </div>
-
-                                    <!-- Answer 3 -->
-                                    <div class="answer-item">
-                                        <input type="checkbox" name="correct_1_3" class="answer-checkbox" id="answer_1_3">
-                                        <input type="text" name="answer_1_3" class="answer-input" placeholder="Enter answer option 3">
-                                        <button type="button" class="delete-btn" onclick="deleteAnswer(this)">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                                            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-                                            </svg>
-                                        </button>
-                                    </div>
-
-                                    <!-- Answer 4 -->
-                                    <div class="answer-item">
-                                        <input type="checkbox" name="correct_1_4" class="answer-checkbox" id="answer_1_4">
-                                        <input type="text" name="answer_1_4" class="answer-input" placeholder="Enter answer option 4">
-                                        <button type="button" class="delete-btn" onclick="deleteAnswer(this)">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                                            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-                                            </svg>
-                                        </button>
-                                    </div>
+                                    <button type="button" class="add-answer-btn" onclick="addAnswer(1)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                        </svg>
+                                        Add Answer Option
+                                    </button>
                                 </div>
-
-                                <button type="button" class="add-answer-btn" onclick="addAnswer(1)">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                                    </svg>
-                                    Add Answer Option
-                                </button>
-                            </div>
+                            </c:if>
                         </div>
 
                         <button type="button" id="addQuestionBtn" class="add-question-btn">
@@ -372,6 +460,14 @@
                 </div>
             </div>
         </div>
+
         <script src="<%= request.getContextPath() + "/js/createQuestion.js" %>"></script>
+        <script>
+            // Update init value after importing
+            questionCounter = ${fn:length(importedQuestions)};
+            <c:forEach var="q" items="${importedQuestions}" varStatus="qStatus">
+                answerCounters[${qStatus.index + 1}] = ${fn:length(q.answers)};
+            </c:forEach>
+        </script>
     </body>
 </html>

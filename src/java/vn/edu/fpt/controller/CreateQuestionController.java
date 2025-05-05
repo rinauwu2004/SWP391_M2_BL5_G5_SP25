@@ -92,6 +92,7 @@ public class CreateQuestionController extends HttpServlet {
                     }
                 }
             }
+            request.getSession().setAttribute("successMessage", "Quiz created successfully!");
             response.sendRedirect(request.getContextPath() + "/quiz/list");
         } catch (IOException ex) {
             Logger.getLogger(CreateQuestionController.class.getName()).log(Level.SEVERE, null, ex);

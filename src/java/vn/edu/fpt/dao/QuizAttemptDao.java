@@ -9,242 +9,255 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import vn.edu.fpt.model.Quiz;
 import vn.edu.fpt.model.QuizAttempt;
 import vn.edu.fpt.model.User;
+import vn.edu.fpt.model.Quiz;
+import vn.edu.fpt.model.Question;
 
 /**
  *
- * @author ADMIN
+ * @author Rinaaaa
  */
 public class QuizAttemptDao extends DBContext {
-    
-    public List<QuizAttempt> getAttemptsByQuizId(int quizId) {
-        List<QuizAttempt> attempts = new ArrayList<>();
-        QuizDao quizDao = new QuizDao();
-        UserDao userDao = new UserDao();
-        
+
+    /**
+     * Creates a new quiz attempt and returns the generated ID
+     *
+     * @param attempt The quiz attempt to create
+     * @return The ID of the created attempt
+     */
+    public int create(QuizAttempt attempt) {
         String sql = """
-                     SELECT [id], [studentId], [quizId], [startedTime], [submittedTime], [score]
-                     FROM [QuizAttempt]
-                     WHERE [quizId] = ?
-                     ORDER BY [submittedTime] DESC
+                     INSERT INTO [QuizAttempt] 
+                     ([studentId], [quizId], [startedTime]) 
+                     VALUES (?, ?, ?)
                      """;
-        
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, quizId);
-            ResultSet rs = stm.executeQuery();
-            
-            while (rs.next()) {
-                QuizAttempt attempt = new QuizAttempt();
-                attempt.setId(rs.getInt("id"));
-                
-                User student = userDao.getUserById(rs.getInt("studentId"));
-                attempt.setStudent(student);
-                
-                Quiz quiz = quizDao.getQuizById(rs.getInt("quizId"));
-                attempt.setQuiz(quiz);
-                
-                attempt.setStartedTime(rs.getTimestamp("startedTime"));
-                attempt.setSubmittedTime(rs.getTimestamp("submittedTime"));
-                attempt.setScore(rs.getFloat("score"));
-                
-                attempts.add(attempt);
+        try (PreparedStatement stm = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stm.setInt(1, attempt.getStudent().getId());
+            stm.setInt(2, attempt.getQuiz().getId());
+            stm.setTimestamp(3, attempt.getStartedTime());
+            stm.executeUpdate();
+
+            // Get the generated ID
+            try (ResultSet rs = stm.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
             }
         } catch (SQLException ex) {
             Logger.getLogger(QuizAttemptDao.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        return attempts;
+        return 0;
     }
-    
-    public QuizAttempt getAttemptById(int attemptId) {
-        QuizAttempt attempt = null;
-        QuizDao quizDao = new QuizDao();
-        UserDao userDao = new UserDao();
-        
+
+    /**
+     * Updates an existing quiz attempt
+     *
+     * @param attempt The quiz attempt to update
+     */
+    public void update(QuizAttempt attempt) {
         String sql = """
-                     SELECT [id], [studentId], [quizId], [startedTime], [submittedTime], [score]
-                     FROM [QuizAttempt]
+                     UPDATE [QuizAttempt] 
+                     SET [submittedTime] = ?, [score] = ? 
                      WHERE [id] = ?
                      """;
-        
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, attemptId);
-            ResultSet rs = stm.executeQuery();
-            
-            if (rs.next()) {
-                attempt = new QuizAttempt();
-                attempt.setId(rs.getInt("id"));
-                
-                User student = userDao.getUserById(rs.getInt("studentId"));
-                attempt.setStudent(student);
-                
-                Quiz quiz = quizDao.getQuizById(rs.getInt("quizId"));
-                attempt.setQuiz(quiz);
-                
-                attempt.setStartedTime(rs.getTimestamp("startedTime"));
-                attempt.setSubmittedTime(rs.getTimestamp("submittedTime"));
-                attempt.setScore(rs.getFloat("score"));
+            stm.setTimestamp(1, attempt.getSubmittedTime());
+            stm.setFloat(2, attempt.getScore());
+            stm.setInt(3, attempt.getId());
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(QuizAttemptDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Gets a quiz attempt by ID
+     *
+     * @param id The ID of the quiz attempt
+     * @return The quiz attempt, or null if not found
+     */
+    public QuizAttempt get(int id) {
+        QuizAttempt attempt = null;
+        String sql = """
+                     SELECT [id], [studentId], [quizId], [startedTime], 
+                     [submittedTime], [score] 
+                     FROM [QuizAttempt] 
+                     WHERE [id] = ?
+                     """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, id);
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    attempt = new QuizAttempt();
+                    attempt.setId(rs.getInt("id"));
+
+                    // Load student
+                    UserDao userDao = new UserDao();
+                    User student = userDao.getUser(rs.getInt("studentId"));
+                    attempt.setStudent(student);
+
+                    // Load quiz
+                    QuizDao quizDao = new QuizDao();
+                    Quiz quiz = quizDao.get(rs.getInt("quizId"));
+                    attempt.setQuiz(quiz);
+
+                    attempt.setStartedTime(rs.getTimestamp("startedTime"));
+                    attempt.setSubmittedTime(rs.getTimestamp("submittedTime"));
+                    attempt.setScore(rs.getFloat("score"));
+                }
             }
         } catch (SQLException ex) {
             Logger.getLogger(QuizAttemptDao.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
         return attempt;
     }
-    
-    public List<QuizAttempt> getAttemptsByStudentId(int studentId) {
-        List<QuizAttempt> attempts = new ArrayList<>();
-        QuizDao quizDao = new QuizDao();
-        UserDao userDao = new UserDao();
-        
+
+    /**
+     * Gets a quiz attempt by ID with optimized loading of related data Uses a
+     * JOIN query to reduce database calls
+     *
+     * @param id The ID of the quiz attempt
+     * @return The quiz attempt with related data, or null if not found
+     */
+    public QuizAttempt getWithRelatedData(int id) {
+        QuizAttempt attempt = null;
         String sql = """
-                     SELECT [id], [studentId], [quizId], [startedTime], [submittedTime], [score]
-                     FROM [QuizAttempt]
-                     WHERE [studentId] = ?
-                     ORDER BY [submittedTime] DESC
+                     SELECT a.[id], a.[studentId], a.[quizId], a.[startedTime], a.[submittedTime], a.[score],
+                            s.[id] as student_id, s.[first_name], s.[last_name], s.[email_address],
+                            q.[id] as quiz_id, q.[title], q.[code], q.[timeLimit]
+                     FROM [QuizAttempt] a
+                     JOIN [User] s ON a.[studentId] = s.[id]
+                     JOIN [Quiz] q ON a.[quizId] = q.[id]
+                     WHERE a.[id] = ?
                      """;
-        
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, id);
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    attempt = new QuizAttempt();
+                    attempt.setId(rs.getInt("id"));
+
+                    // Create student object directly from join result
+                    User student = new User();
+                    student.setId(rs.getInt("student_id"));
+                    student.setFirstName(rs.getString("first_name"));
+                    student.setLastName(rs.getString("last_name"));
+                    student.setEmailAddress(rs.getString("email_address"));
+                    attempt.setStudent(student);
+
+                    // Create quiz object directly from join result
+                    Quiz quiz = new Quiz();
+                    quiz.setId(rs.getInt("quiz_id"));
+                    quiz.setTitle(rs.getString("title"));
+                    quiz.setCode(rs.getString("code"));
+                    quiz.setTimeLimit(rs.getInt("timeLimit"));
+
+                    // Load questions for the quiz in a single query
+                    QuestionDao questionDao = new QuestionDao();
+                    List<Question> questions = questionDao.getQuestionsByQuizId(quiz.getId());
+                    quiz.setQuestions(questions);
+
+                    attempt.setQuiz(quiz);
+
+                    attempt.setStartedTime(rs.getTimestamp("startedTime"));
+                    attempt.setSubmittedTime(rs.getTimestamp("submittedTime"));
+                    attempt.setScore(rs.getFloat("score"));
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(QuizAttemptDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return attempt;
+    }
+
+    /**
+     * Gets all quiz attempts for a student
+     *
+     * @param studentId The ID of the student
+     * @return A list of quiz attempts
+     */
+    public List<QuizAttempt> getByStudent(int studentId) {
+        List<QuizAttempt> attempts = new ArrayList<>();
+        String sql = """
+                     SELECT [id], [studentId], [quizId], [startedTime], 
+                     [submittedTime], [score] 
+                     FROM [QuizAttempt] 
+                     WHERE [studentId] = ? 
+                     ORDER BY [startedTime] DESC
+                     """;
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, studentId);
-            ResultSet rs = stm.executeQuery();
-            
-            while (rs.next()) {
-                QuizAttempt attempt = new QuizAttempt();
-                attempt.setId(rs.getInt("id"));
-                
-                User student = userDao.getUserById(rs.getInt("studentId"));
-                attempt.setStudent(student);
-                
-                Quiz quiz = quizDao.getQuizById(rs.getInt("quizId"));
-                attempt.setQuiz(quiz);
-                
-                attempt.setStartedTime(rs.getTimestamp("startedTime"));
-                attempt.setSubmittedTime(rs.getTimestamp("submittedTime"));
-                attempt.setScore(rs.getFloat("score"));
-                
-                attempts.add(attempt);
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    QuizAttempt attempt = new QuizAttempt();
+                    attempt.setId(rs.getInt("id"));
+
+                    // Load student
+                    UserDao userDao = new UserDao();
+                    User student = userDao.getUser(rs.getInt("studentId"));
+                    attempt.setStudent(student);
+
+                    // Load quiz
+                    QuizDao quizDao = new QuizDao();
+                    Quiz quiz = quizDao.get(rs.getInt("quizId"));
+                    attempt.setQuiz(quiz);
+
+                    attempt.setStartedTime(rs.getTimestamp("startedTime"));
+                    attempt.setSubmittedTime(rs.getTimestamp("submittedTime"));
+                    attempt.setScore(rs.getFloat("score"));
+
+                    attempts.add(attempt);
+                }
             }
         } catch (SQLException ex) {
             Logger.getLogger(QuizAttemptDao.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
         return attempts;
     }
-    
-    public double getAverageScoreByQuizId(int quizId) {
-        double averageScore = 0;
-        
+
+    /**
+     * Gets all quiz attempts for a quiz
+     *
+     * @param quizId The ID of the quiz
+     * @return A list of quiz attempts
+     */
+    public List<QuizAttempt> getByQuiz(int quizId) {
+        List<QuizAttempt> attempts = new ArrayList<>();
         String sql = """
-                     SELECT AVG([score]) AS averageScore
-                     FROM [QuizAttempt]
-                     WHERE [quizId] = ? AND [submittedTime] IS NOT NULL
+                     SELECT [id], [studentId], [quizId], [startedTime], 
+                     [submittedTime], [score] 
+                     FROM [QuizAttempt] 
+                     WHERE [quizId] = ? 
+                     ORDER BY [startedTime] DESC
                      """;
-        
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, quizId);
-            ResultSet rs = stm.executeQuery();
-            
-            if (rs.next()) {
-                averageScore = rs.getDouble("averageScore");
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    QuizAttempt attempt = new QuizAttempt();
+                    attempt.setId(rs.getInt("id"));
+
+                    // Load student
+                    UserDao userDao = new UserDao();
+                    User student = userDao.getUser(rs.getInt("studentId"));
+                    attempt.setStudent(student);
+
+                    // Load quiz
+                    QuizDao quizDao = new QuizDao();
+                    Quiz quiz = quizDao.get(rs.getInt("quizId"));
+                    attempt.setQuiz(quiz);
+
+                    attempt.setStartedTime(rs.getTimestamp("startedTime"));
+                    attempt.setSubmittedTime(rs.getTimestamp("submittedTime"));
+                    attempt.setScore(rs.getFloat("score"));
+
+                    attempts.add(attempt);
+                }
             }
         } catch (SQLException ex) {
             Logger.getLogger(QuizAttemptDao.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        return averageScore;
-    }
-    
-    public int getCompletedAttemptsCount(int quizId) {
-        int count = 0;
-        
-        String sql = """
-                     SELECT COUNT(*) AS completedCount
-                     FROM [QuizAttempt]
-                     WHERE [quizId] = ? AND [submittedTime] IS NOT NULL
-                     """;
-        
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, quizId);
-            ResultSet rs = stm.executeQuery();
-            
-            if (rs.next()) {
-                count = rs.getInt("completedCount");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(QuizAttemptDao.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        return count;
-    }
-    
-    public int getInProgressAttemptsCount(int quizId) {
-        int count = 0;
-        
-        String sql = """
-                     SELECT COUNT(*) AS inProgressCount
-                     FROM [QuizAttempt]
-                     WHERE [quizId] = ? AND [submittedTime] IS NULL
-                     """;
-        
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, quizId);
-            ResultSet rs = stm.executeQuery();
-            
-            if (rs.next()) {
-                count = rs.getInt("inProgressCount");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(QuizAttemptDao.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        return count;
-    }
-    
-    public float getHighestScoreByQuizId(int quizId) {
-        float highestScore = 0;
-        
-        String sql = """
-                     SELECT MAX([score]) AS highestScore
-                     FROM [QuizAttempt]
-                     WHERE [quizId] = ? AND [submittedTime] IS NOT NULL
-                     """;
-        
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, quizId);
-            ResultSet rs = stm.executeQuery();
-            
-            if (rs.next()) {
-                highestScore = rs.getFloat("highestScore");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(QuizAttemptDao.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        return highestScore;
-    }
-    
-    public float getLowestScoreByQuizId(int quizId) {
-        float lowestScore = 0;
-        
-        String sql = """
-                     SELECT MIN([score]) AS lowestScore
-                     FROM [QuizAttempt]
-                     WHERE [quizId] = ? AND [submittedTime] IS NOT NULL
-                     """;
-        
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, quizId);
-            ResultSet rs = stm.executeQuery();
-            
-            if (rs.next() && rs.getObject("lowestScore") != null) {
-                lowestScore = rs.getFloat("lowestScore");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(QuizAttemptDao.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        return lowestScore;
+        return attempts;
     }
 }
