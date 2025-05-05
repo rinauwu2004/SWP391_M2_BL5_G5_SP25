@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import vn.edu.fpt.model.QuizAttempt;
 import vn.edu.fpt.model.User;
 import vn.edu.fpt.model.Quiz;
+import vn.edu.fpt.model.Question;
 
 /**
  *
@@ -99,6 +100,64 @@ public class QuizAttemptDao extends DBContext {
                     // Load quiz
                     QuizDao quizDao = new QuizDao();
                     Quiz quiz = quizDao.get(rs.getInt("quizId"));
+                    attempt.setQuiz(quiz);
+
+                    attempt.setStartedTime(rs.getTimestamp("startedTime"));
+                    attempt.setSubmittedTime(rs.getTimestamp("submittedTime"));
+                    attempt.setScore(rs.getFloat("score"));
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(QuizAttemptDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return attempt;
+    }
+
+    /**
+     * Gets a quiz attempt by ID with optimized loading of related data Uses a
+     * JOIN query to reduce database calls
+     *
+     * @param id The ID of the quiz attempt
+     * @return The quiz attempt with related data, or null if not found
+     */
+    public QuizAttempt getWithRelatedData(int id) {
+        QuizAttempt attempt = null;
+        String sql = """
+                     SELECT a.[id], a.[studentId], a.[quizId], a.[startedTime], a.[submittedTime], a.[score],
+                            s.[id] as student_id, s.[first_name], s.[last_name], s.[email_address],
+                            q.[id] as quiz_id, q.[title], q.[code], q.[timeLimit]
+                     FROM [QuizAttempt] a
+                     JOIN [User] s ON a.[studentId] = s.[id]
+                     JOIN [Quiz] q ON a.[quizId] = q.[id]
+                     WHERE a.[id] = ?
+                     """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, id);
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    attempt = new QuizAttempt();
+                    attempt.setId(rs.getInt("id"));
+
+                    // Create student object directly from join result
+                    User student = new User();
+                    student.setId(rs.getInt("student_id"));
+                    student.setFirstName(rs.getString("first_name"));
+                    student.setLastName(rs.getString("last_name"));
+                    student.setEmailAddress(rs.getString("email_address"));
+                    attempt.setStudent(student);
+
+                    // Create quiz object directly from join result
+                    Quiz quiz = new Quiz();
+                    quiz.setId(rs.getInt("quiz_id"));
+                    quiz.setTitle(rs.getString("title"));
+                    quiz.setCode(rs.getString("code"));
+                    quiz.setTimeLimit(rs.getInt("timeLimit"));
+
+                    // Load questions for the quiz in a single query
+                    QuestionDao questionDao = new QuestionDao();
+                    List<Question> questions = questionDao.getQuestionsByQuizId(quiz.getId());
+                    quiz.setQuestions(questions);
+
                     attempt.setQuiz(quiz);
 
                     attempt.setStartedTime(rs.getTimestamp("startedTime"));

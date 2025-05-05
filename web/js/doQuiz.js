@@ -233,6 +233,9 @@ function updateQuestionUI(data) {
             // Cập nhật UI cho các nút câu hỏi
             updateQuestionButtonsUI()
 
+            // Lưu câu trả lời ngay khi checkbox thay đổi
+            saveCurrentAnswers()
+
             console.log("Answered questions after checkbox change:", window.answeredQuestionsArray)
         })
     })
@@ -316,11 +319,27 @@ function saveCurrentAnswers() {
     const xhr = new XMLHttpRequest()
     xhr.open("POST", "do", true)
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
-    xhr.send("action=saveAnswers" + "&questionId=" + questionId + "&answers=" + selectedValues.join(","))
+
+    // Tạo chuỗi tham số cho nhiều câu trả lời
+    let params = "action=saveAnswers&questionId=" + questionId
+
+    // Thêm mỗi câu trả lời như một tham số riêng biệt
+    if (selectedValues.length > 0) {
+        selectedValues.forEach((value) => {
+            params += "&answers=" + encodeURIComponent(value)
+        })
+    } else {
+        // Nếu không có câu trả lời nào được chọn, gửi một tham số trống
+        params += "&answers="
+    }
+
+    xhr.send(params)
 }
 
 // Submit confirmation
 function showSubmitConfirmation() {
+    // Lưu câu trả lời hiện tại trước khi hiển thị xác nhận
+    saveCurrentAnswers()
     document.getElementById("submitModal").style.display = "flex"
 }
 
@@ -330,24 +349,24 @@ function hideSubmitConfirmation() {
 
 function submitQuiz() {
     // First save the current question's answers
-    saveCurrentAnswers();
-    
+    saveCurrentAnswers()
+
     // Create a form to submit
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = window.location.pathname; // Chỉ sử dụng pathname, không thêm query string
-    
+    const form = document.createElement("form")
+    form.method = "POST"
+    form.action = window.location.pathname // Chỉ sử dụng pathname, không thêm query string
+
     // Add a hidden field to indicate this is a quiz submission
-    const actionInput = document.createElement('input');
-    actionInput.type = 'hidden';
-    actionInput.name = 'action';
-    actionInput.value = 'submitQuiz';
-    form.appendChild(actionInput);
-    
+    const actionInput = document.createElement("input")
+    actionInput.type = "hidden"
+    actionInput.name = "action"
+    actionInput.value = "submitQuiz"
+    form.appendChild(actionInput)
+
     // Append form to body, submit it, and then remove it
-    document.body.appendChild(form);
-    form.submit();
-    document.body.removeChild(form);
+    document.body.appendChild(form)
+    form.submit()
+    document.body.removeChild(form)
 }
 
 // Khởi tạo khi trang được tải
@@ -407,6 +426,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Cập nhật UI cho các nút câu hỏi
             updateQuestionButtonsUI()
+
+            // Lưu câu trả lời ngay khi checkbox thay đổi
+            saveCurrentAnswers()
 
             console.log("Answered questions after checkbox change:", window.answeredQuestionsArray)
         })

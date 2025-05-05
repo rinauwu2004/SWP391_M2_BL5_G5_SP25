@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package vn.edu.fpt.controller;
 
 import java.io.IOException;
@@ -111,9 +107,9 @@ public class DoQuizController extends HttpServlet {
             quizId = attempt.getQuiz().getId();
         }
 
-        // Load questions for this quiz
+        // Load questions for this quiz with optimized method
         QuestionDao questionDao = new QuestionDao();
-        List<Question> questions = questionDao.getQuestionsByQuizId(quizId);
+        List<Question> questions = questionDao.getQuestionsWithAnswersByQuizId(quizId);
 
         if (questions.isEmpty()) {
             request.setAttribute("errorMessage", "No questions found for this quiz.");
@@ -132,10 +128,6 @@ public class DoQuizController extends HttpServlet {
         // Get current question
         Question currentQuestion = questions.get(questionNumber - 1);
 
-        // Load answers for current question
-        AnswerDao answerDao = new AnswerDao();
-        List<Answer> options = answerDao.getAnswersByQuestionId(currentQuestion.getId());
-
         // Get selected answers for current question
         Map<Integer, List<Integer>> answeredQuestions
                 = (Map<Integer, List<Integer>>) session.getAttribute("answeredQuestions");
@@ -147,7 +139,7 @@ public class DoQuizController extends HttpServlet {
         request.setAttribute("currentQuestion", currentQuestion);
         request.setAttribute("questionNumber", questionNumber);
         request.setAttribute("totalQuestions", questions.size());
-        request.setAttribute("options", options);
+        request.setAttribute("options", currentQuestion.getAnswers());
         request.setAttribute("selectedAnswers", selectedAnswers);
         request.setAttribute("answeredQuestions", answeredQuestions);
 
@@ -237,6 +229,42 @@ public class DoQuizController extends HttpServlet {
                 = (Map<Integer, List<Integer>>) session.getAttribute("answeredQuestions");
         answeredQuestions.put(questionId, selectedAnswers);
 
+        // Get current attempt
+        QuizAttempt attempt = (QuizAttempt) session.getAttribute("currentAttempt");
+        if (attempt == null) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("No active quiz attempt");
+            return;
+        }
+
+        // Delete existing answers for this question
+        QuizAttemptDetailDao detailDao = new QuizAttemptDetailDao();
+        detailDao.deleteByAttemptAndQuestion(attempt.getId(), questionId);
+
+        // Save new answers
+        if (!selectedAnswers.isEmpty()) {
+            // Create Question object
+            Question question = new Question();
+            question.setId(questionId);
+
+            // Create batch of details to save
+            List<QuizAttemptDetail> detailsToSave = new ArrayList<>();
+            for (Integer answerId : selectedAnswers) {
+                QuizAttemptDetail detail = new QuizAttemptDetail();
+                detail.setAttempt(attempt);
+                detail.setQuestion(question);
+
+                Answer answer = new Answer();
+                answer.setId(answerId);
+                detail.setAnswer(answer);
+
+                detailsToSave.add(detail);
+            }
+
+            // Save all details in batch
+            detailDao.createBatch(detailsToSave);
+        }
+
         // Return success response for AJAX
         response.setContentType("text/plain");
         response.getWriter().write("success");
@@ -260,17 +288,13 @@ public class DoQuizController extends HttpServlet {
         // Set submission time
         attempt.setSubmittedTime(new Timestamp(System.currentTimeMillis()));
 
-        // Save all answers to database
-        QuizAttemptDetailDao detailDao = new QuizAttemptDetailDao();
-        AnswerDao answerDao = new AnswerDao();
-        QuestionDao questionDao = new QuestionDao();
-
         // Get all questions for this quiz
         List<Question> allQuestions = attempt.getQuiz().getQuestions();
-        
-        // If questions are not loaded yet, load them
+
+        // If questions are not loaded yet, load them with answers
         if (allQuestions == null || allQuestions.isEmpty()) {
-            allQuestions = questionDao.getQuestionsByQuizId(attempt.getQuiz().getId());
+            QuestionDao questionDao = new QuestionDao();
+            allQuestions = questionDao.getQuestionsWithAnswersByQuizId(attempt.getQuiz().getId());
             attempt.getQuiz().setQuestions(allQuestions);
         }
 
@@ -278,30 +302,43 @@ public class DoQuizController extends HttpServlet {
         float totalQuestions = allQuestions.size();
         float correctAnswers = 0;
 
+        // Get all correct answers for all questions in one query
+        AnswerDao answerDao = new AnswerDao();
+        List<Integer> questionIds = allQuestions.stream()
+                .map(Question::getId)
+                .collect(Collectors.toList());
+
+        Map<Integer, List<Answer>> allCorrectAnswers = new HashMap<>();
+        for (Question question : allQuestions) {
+            List<Answer> correctAnswersForQuestion = question.getAnswers().stream()
+                    .filter(Answer::isIsCorrect)
+                    .collect(Collectors.toList());
+            allCorrectAnswers.put(question.getId(), correctAnswersForQuestion);
+        }
+
+        // Save all answers to database in batch
+        QuizAttemptDetailDao detailDao = new QuizAttemptDetailDao();
+        List<QuizAttemptDetail> allDetails = new ArrayList<>();
+
         for (Question question : allQuestions) {
             int questionId = question.getId();
             List<Integer> selectedAnswerIds = answeredQuestions.getOrDefault(questionId, new ArrayList<>());
 
             // Save each selected answer
             for (Integer answerId : selectedAnswerIds) {
-                try {
-                    Answer answer = answerDao.getAnswerById(answerId);
-                    if (answer != null) {
-                        QuizAttemptDetail detail = new QuizAttemptDetail();
-                        detail.setAttempt(attempt);
-                        detail.setQuestion(question);
-                        detail.setAnswer(answer);
+                QuizAttemptDetail detail = new QuizAttemptDetail();
+                detail.setAttempt(attempt);
+                detail.setQuestion(question);
 
-                        // Gọi phương thức create để lưu vào database
-                        detailDao.create(detail);
-                    }
-                } catch (Exception e) {
-                    // Continue with next answer
-                }
+                Answer answer = new Answer();
+                answer.setId(answerId);
+                detail.setAnswer(answer);
+
+                allDetails.add(detail);
             }
 
             // Check if answers are correct
-            List<Answer> correctAnswersForQuestion = answerDao.getCorrectAnswersByQuestionId(questionId);
+            List<Answer> correctAnswersForQuestion = allCorrectAnswers.get(questionId);
             List<Integer> correctAnswerIds = correctAnswersForQuestion.stream()
                     .map(Answer::getId)
                     .collect(Collectors.toList());
@@ -313,6 +350,9 @@ public class DoQuizController extends HttpServlet {
                 correctAnswers++;
             }
         }
+
+        // Save all details in batch
+        detailDao.createBatch(allDetails);
 
         // Calculate score as percentage
         float score = (totalQuestions > 0) ? (correctAnswers / totalQuestions) * 100 : 0;
@@ -327,8 +367,11 @@ public class DoQuizController extends HttpServlet {
         session.removeAttribute("answeredQuestions");
         session.removeAttribute("currentQuestionNumber");
 
+        // Ensure the redirect URL is correct and properly formed
+        String redirectUrl = request.getContextPath() + "/quiz/result?attemptId=" + attempt.getId();
+
         // Redirect to results page
-        response.sendRedirect(request.getContextPath() + "/quiz/result?attemptId=" + attempt.getId());
+        response.sendRedirect(redirectUrl);
     }
 
     private void getQuestionData(HttpServletRequest request, HttpServletResponse response)
@@ -346,11 +389,11 @@ public class DoQuizController extends HttpServlet {
 
         // Get questions from the quiz object
         List<Question> questions = attempt.getQuiz().getQuestions();
-        
-        // If questions are not loaded yet, load them
+
+        // If questions are not loaded yet, load them with answers
         if (questions == null || questions.isEmpty()) {
             QuestionDao questionDao = new QuestionDao();
-            questions = questionDao.getQuestionsByQuizId(attempt.getQuiz().getId());
+            questions = questionDao.getQuestionsWithAnswersByQuizId(attempt.getQuiz().getId());
             attempt.getQuiz().setQuestions(questions);
         }
 
@@ -360,10 +403,6 @@ public class DoQuizController extends HttpServlet {
 
         // Get current question
         Question currentQuestion = questions.get(questionNumber - 1);
-
-        // Load answers for current question
-        AnswerDao answerDao = new AnswerDao();
-        List<Answer> options = answerDao.getAnswersByQuestionId(currentQuestion.getId());
 
         // Get selected answers for current question
         Map<Integer, List<Integer>> answeredQuestions
@@ -380,6 +419,7 @@ public class DoQuizController extends HttpServlet {
 
         // Add options
         json.append("\"options\":[");
+        List<Answer> options = currentQuestion.getAnswers();
         for (int i = 0; i < options.size(); i++) {
             Answer option = options.get(i);
             json.append("{");
