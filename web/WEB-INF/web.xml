@@ -123,6 +123,10 @@
         <servlet-name>ViewQuizHistoryController</servlet-name>
         <servlet-class>vn.edu.fpt.controller.ViewQuizHistoryController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>SubjectManagerHomepage</servlet-name>
+        <servlet-class>vn.edu.fpt.controller.SubjectManagerHomepage</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>QuizResultController</servlet-name>
         <url-pattern>/quiz/result</url-pattern>
@@ -244,6 +248,10 @@
     <servlet-mapping>
         <servlet-name>ViewQuizHistoryController</servlet-name>
         <url-pattern>/quiz/history</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SubjectManagerHomepage</servlet-name>
+        <url-pattern>/subjectmanager/home</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>home</welcome-file>

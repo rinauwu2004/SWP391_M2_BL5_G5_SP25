@@ -269,7 +269,7 @@ public class UserDao extends DBContext {
                             [country_id], [phone_number], [email_address], [address],
                             [status_id], [role_id], [created_at]
                      FROM [User]
-                     WHERE [role_id] IN (2, 3)
+                     WHERE [role_id] IN (2, 3, 4)
                      ORDER BY [id]
                      OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
                      """;

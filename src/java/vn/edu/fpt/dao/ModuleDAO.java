@@ -210,4 +210,19 @@ public class ModuleDAO extends DBContext {
         }
     }
 
+    public int countAllModules() {
+        int count = 0;
+        String sql = "SELECT COUNT(*) AS moduleCount FROM Module";
+
+        try (Connection conn = new DBContext().connection; PreparedStatement stm = conn.prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
+
+            if (rs.next()) {
+                count = rs.getInt("moduleCount");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ModuleDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return count;
+    }
 }

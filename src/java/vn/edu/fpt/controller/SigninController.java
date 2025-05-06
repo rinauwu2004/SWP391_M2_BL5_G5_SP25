@@ -72,6 +72,9 @@ public class SigninController extends HttpServlet {
                         case 3: // Teacher
                             response.sendRedirect(request.getContextPath() + "/teacher/home");
                             break;
+                        case 4: //Subject Manager
+                            response.sendRedirect(request.getContextPath() + "/subjectmanager/home");
+                            break;
                         default:
                             response.sendRedirect(request.getContextPath() + "/home");
                             break;

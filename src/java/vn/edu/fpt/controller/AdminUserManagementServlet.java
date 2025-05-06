@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import vn.edu.fpt.dao.CountryDao;
@@ -296,7 +295,7 @@ public class AdminUserManagementServlet extends HttpServlet {
         List<Role> allRoles = roleDao.getAllRoles();
         List<Role> roles = new java.util.ArrayList<>();
         for (Role role : allRoles) {
-            if (role.getId() == 2 || role.getId() == 3) {
+            if (role.getId() != 1) {
                 roles.add(role);
             }
         }
@@ -534,8 +533,8 @@ public class AdminUserManagementServlet extends HttpServlet {
             java.sql.Date dob = java.sql.Date.valueOf(dobParam);
 
             // Validate role ID (only allow Student (2) or Teacher (3))
-            if (roleId != 2 && roleId != 3) {
-                request.setAttribute("error", "Invalid role selected. Only Student or Teacher roles are allowed.");
+            if (roleId == 1) {
+                request.setAttribute("error", "Invalid role selected. Admin cannot created.");
                 showCreateForm(request, response);
                 return;
             }
