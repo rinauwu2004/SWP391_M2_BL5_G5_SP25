@@ -4,12 +4,7 @@
     <head>
         <title>Add New Subject</title>
         <style>
-            body {
-                font-family: Arial, sans-serif;
-                background: #f8f9fc;
-                padding: 40px;
-                position: relative; /* Đảm bảo các phần tử như thông báo có thể được đặt tuyệt đối */
-            }
+            
             .form-container {
                 background: #fff;
                 padding: 30px;
@@ -75,11 +70,11 @@
         </style>
     </head>
     <body>
-
+           <c:import url="../sidebar.jsp" />
         <div class="notification">
             <c:import url="../../../notification.jsp" />
         </div>
-
+ <main class="main-content">
 
         <div class="form-container">
             <h2>Add New Subject</h2>
@@ -107,5 +102,6 @@
                 </div>
             </form>
         </div>
+      </div>
     </body>
 </html>

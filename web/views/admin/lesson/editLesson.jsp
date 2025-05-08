@@ -7,16 +7,7 @@
         <meta charset="UTF-8">
         <title>Edit Lesson</title>
         <style>
-            body {
-                background-color: #f5f6fa;
-                font-family: 'Poppins', sans-serif;
-                margin: 0;
-                padding: 0;
-                height: 100vh;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
+           
             .container {
                 width: 100%;
                 max-width: 500px;
@@ -121,11 +112,13 @@
 
     </head>
     <body>
-
+<c:import url="../sidebar.jsp" />
 
         <div class="notification">
             <c:import url="../../../notification.jsp" />
         </div>
+        <main class="main-content">
+            </div>
         <div class="container">
             <h2>Edit Lesson</h2>
             <form action="lesson-edit" method="post">

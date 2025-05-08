@@ -79,42 +79,74 @@ public class LessonDAO extends DBContext {
     }
 
     public boolean updateLesson(int id, String lessonName, String description, int status) {
-        String sql = "UPDATE Lesson SET name = ?, description = ?, status = ?, modified_at = GETDATE() WHERE id = ?";
+        String checkSql = "SELECT COUNT(*) FROM Lesson WHERE name = ? AND id <> ?";
+        String updateSql = "UPDATE Lesson SET name = ?, description = ?, status = ?, modified_at = GETDATE() WHERE id = ?";
 
-        try (Connection conn = new DBContext().connection; PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = new DBContext().connection; PreparedStatement checkPs = conn.prepareStatement(checkSql)) {
 
-            ps.setString(1, lessonName);
-            ps.setString(2, description);
-            ps.setInt(3, status);
-            ps.setInt(4, id);
+            // Kiểm tra xem tên bài học đã tồn tại chưa (trừ bài học đang sửa)
+            checkPs.setString(1, lessonName);
+            checkPs.setInt(2, id);
 
-            ps.executeUpdate();
+            ResultSet rs = checkPs.executeQuery();
+            if (rs.next() && rs.getInt(1) > 0) {
+                // Tên bài học đã tồn tại
+                System.out.println("Lesson name already exists.");
+                return false;
+            }
 
-        } catch (SQLException ex) {
-            Logger.getLogger(LessonDAO.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return true;
-    }
+            // Nếu không trùng thì tiến hành cập nhật
+            try (PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
+                updatePs.setString(1, lessonName);
+                updatePs.setString(2, description);
+                updatePs.setInt(3, status);
+                updatePs.setInt(4, id);
 
-    public boolean createLesson(String lessonName, String description, int status, int subjectId) {
-        String sql = "INSERT INTO Lesson (name, description, subject_id, status, created_at, modified_at) "
-                + "VALUES (?, ?, ?, ?, GETDATE(), GETDATE())";
-
-        try (Connection conn = new DBContext().connection; PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, lessonName);
-            ps.setString(2, description);
-            ps.setInt(3, subjectId);  // thêm subjectId
-            ps.setInt(4, status);
-
-            int rowsAffected = ps.executeUpdate();
-            return rowsAffected > 0;
+                updatePs.executeUpdate();
+            }
 
         } catch (SQLException ex) {
             Logger.getLogger(LessonDAO.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
+
+        return true;
     }
+
+    public boolean createLesson(String lessonName, String description, int status, int subjectId) {
+    String checkSql = "SELECT COUNT(*) FROM Lesson WHERE name = ? AND subject_id = ?";
+    String insertSql = "INSERT INTO Lesson (name, description, subject_id, status, created_at, modified_at) "
+            + "VALUES (?, ?, ?, ?, GETDATE(), GETDATE())";
+
+    try (Connection conn = new DBContext().connection;
+         PreparedStatement checkPs = conn.prepareStatement(checkSql)) {
+
+        // Kiểm tra trùng tên bài học trong cùng subject
+        checkPs.setString(1, lessonName);
+        checkPs.setInt(2, subjectId);
+
+        ResultSet rs = checkPs.executeQuery();
+        if (rs.next() && rs.getInt(1) > 0) {
+            System.out.println("Lesson name already exists in this subject.");
+            return false;
+        }
+
+        // Nếu không trùng thì tạo mới
+        try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
+            insertPs.setString(1, lessonName);
+            insertPs.setString(2, description);
+            insertPs.setInt(3, subjectId);
+            insertPs.setInt(4, status);
+
+            int rowsAffected = insertPs.executeUpdate();
+            return rowsAffected > 0;
+        }
+
+    } catch (SQLException ex) {
+        Logger.getLogger(LessonDAO.class.getName()).log(Level.SEVERE, null, ex);
+        return false;
+    }
+}
 
     public List<Lesson> getAllLessonBySubjectId(int subjectId) {
         List<Lesson> list = new ArrayList<>();

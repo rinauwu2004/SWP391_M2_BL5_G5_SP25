@@ -146,10 +146,11 @@ public class SubjectDAO extends DBContext {
     }
 
     public boolean addSubject(Subject subject) {
-        String query = "INSERT INTO [Subject] ([code], [name], [description], [status], [created_at], [modified_at]) "
+        String checkQuery = "SELECT COUNT(*) FROM [Subject] WHERE [code] = ? OR [name] = ?";
+        String insertQuery = "INSERT INTO [Subject] ([code], [name], [description], [status], [created_at], [modified_at]) "
                 + "VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = new DBContext().connection; PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = new DBContext().connection) {
 
             if (conn == null || conn.isClosed()) {
                 LOGGER.log(Level.SEVERE, "Database connection is null or closed");
@@ -162,16 +163,31 @@ public class SubjectDAO extends DBContext {
                 throw new IllegalArgumentException("Subject data is incomplete or invalid");
             }
 
-            stmt.setString(1, subject.getCode());
-            stmt.setString(2, subject.getName());
-            stmt.setString(3, subject.getDescription());
-            stmt.setBoolean(4, subject.isStatus());
-            stmt.setTimestamp(5, new java.sql.Timestamp(subject.getCreatedAt().getTime()));
-            stmt.setTimestamp(6, subject.getModifiedAt() != null
-                    ? new java.sql.Timestamp(subject.getModifiedAt().getTime()) : null);
+            // Check for duplicate code or name
+            try (PreparedStatement checkStmt = conn.prepareStatement(checkQuery)) {
+                checkStmt.setString(1, subject.getCode().trim());
+                checkStmt.setString(2, subject.getName().trim());
 
-            stmt.executeUpdate();
-            return true;
+                ResultSet rs = checkStmt.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) {
+                    LOGGER.log(Level.WARNING, "Subject with same code or name already exists");
+                    return false;
+                }
+            }
+
+            // Proceed with insert
+            try (PreparedStatement stmt = conn.prepareStatement(insertQuery)) {
+                stmt.setString(1, subject.getCode().trim());
+                stmt.setString(2, subject.getName().trim());
+                stmt.setString(3, subject.getDescription());
+                stmt.setBoolean(4, subject.isStatus());
+                stmt.setTimestamp(5, new java.sql.Timestamp(subject.getCreatedAt().getTime()));
+                stmt.setTimestamp(6, subject.getModifiedAt() != null
+                        ? new java.sql.Timestamp(subject.getModifiedAt().getTime()) : null);
+
+                stmt.executeUpdate();
+                return true;
+            }
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error adding subject: {0}", e.getMessage());
@@ -180,10 +196,11 @@ public class SubjectDAO extends DBContext {
     }
 
     public boolean editSubject(String subjectId, String code, String name, String status, String description) {
-        String query = "UPDATE [Subject] SET [code] = ?, [name] = ?, [description] = ?, [status] = ?, [modified_at] = ? "
+        String checkSql = "SELECT COUNT(*) FROM [Subject] WHERE (code = ? OR name = ?) AND id <> ?";
+        String updateSql = "UPDATE [Subject] SET [code] = ?, [name] = ?, [description] = ?, [status] = ?, [modified_at] = ? "
                 + "WHERE [id] = ?";
 
-        try (Connection conn = new DBContext().connection; PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = new DBContext().connection) {
 
             if (conn == null || conn.isClosed()) {
                 LOGGER.log(Level.SEVERE, "Database connection is null or closed");
@@ -205,17 +222,33 @@ public class SubjectDAO extends DBContext {
                 return false;
             }
 
-            boolean statusBool = status != null && status.equalsIgnoreCase("true");
+            // Check for duplicate code or name
+            try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+                checkStmt.setString(1, code.trim());
+                checkStmt.setString(2, name.trim());
+                checkStmt.setInt(3, id);
 
-            stmt.setString(1, code.trim());
-            stmt.setString(2, name.trim());
-            stmt.setString(3, description != null ? description.trim() : null);
-            stmt.setBoolean(4, statusBool);
-            stmt.setTimestamp(5, new java.sql.Timestamp(System.currentTimeMillis())); // Current time for modified_at
-            stmt.setInt(6, id);
+                ResultSet rs = checkStmt.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) {
+                    LOGGER.log(Level.WARNING, "Subject code or name already exists for another subject.");
+                    return false;
+                }
+            }
 
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
+            // If no duplicates, perform update
+            try (PreparedStatement stmt = conn.prepareStatement(updateSql)) {
+                boolean statusBool = status != null && status.equalsIgnoreCase("true");
+
+                stmt.setString(1, code.trim());
+                stmt.setString(2, name.trim());
+                stmt.setString(3, description != null ? description.trim() : null);
+                stmt.setBoolean(4, statusBool);
+                stmt.setTimestamp(5, new java.sql.Timestamp(System.currentTimeMillis()));
+                stmt.setInt(6, id);
+
+                int rowsAffected = stmt.executeUpdate();
+                return rowsAffected > 0;
+            }
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error updating subject with ID {0}: {1}", new Object[]{subjectId, e.getMessage()});

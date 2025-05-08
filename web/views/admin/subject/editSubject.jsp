@@ -4,12 +4,7 @@
     <head>
         <title>Edit Subject</title>
         <style>
-            body {
-                font-family: Arial, sans-serif;
-                background: #f8f9fc;
-                padding: 40px;
-                position: relative;
-            }
+            
             .form-container {
                 background: #fff;
                 padding: 30px;
@@ -75,11 +70,12 @@
         </style>
     </head>
     <body>
-
+ <c:import url="../sidebar.jsp" />
         <div class="notification">
             <c:import url="../../../notification.jsp" />
         </div>
-
+<main class="main-content">
+      </div>
         <div class="form-container">
             <h2>Edit Subject</h2>
             <p>Modify the details for the subject below</p>

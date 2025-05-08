@@ -68,10 +68,12 @@
         </style>
     </head>
     <body>
+         <c:import url="../sidebar.jsp" />
         <div class="notification">
             <c:import url="../../../notification.jsp" />
         </div>
-
+<main class="main-content">
+     </div>
         <div class="detail-container">
             <div class="detail-header">Lesson Details</div>
 

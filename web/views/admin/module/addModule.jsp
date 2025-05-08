@@ -10,16 +10,7 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
 
         <style>
-            body {
-                background-color: #f5f6fa;
-                font-family: 'Poppins', sans-serif;
-                margin: 0;
-                padding: 0;
-                height: 100vh;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
+          
             .container {
                 width: 100%;
                 max-width: 500px;
@@ -121,13 +112,15 @@
             }
         </style>
     </head>
-    <body class="p-4">
-
+    <body class="">
+ <c:import url="../sidebar.jsp" />
         <div class="notification">
             <c:import url="../../../notification.jsp" />
         </div>
-
-        <div class="container">
+ <main class="main-content">
+     
+       </div> 
+       <div class="container">
             <h3 class="mb-4">Add New Module</h3>
 
             <form action="addModule" method="post" class="needs-validation" novalidate>

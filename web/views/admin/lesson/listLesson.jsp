@@ -10,13 +10,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
         <style>
-            body {
-                font-family: Arial, sans-serif;
-                background-color: #f5f5f5;
-                margin: 0;
-                padding: 0;
-            }
-
+         
             .container {
                 max-width: 1200px;
                 margin: 20px auto;
@@ -172,17 +166,18 @@
         </style>
     </head>
     <body>
-
+ <c:import url="../sidebar.jsp" />
 
         <div class="notification">
             <c:import url="../../../notification.jsp" />
         </div>
-
+ <main class="main-content">
+     </div>
         <div class="container">
             <div class="header">
                 <div class="title">
                     <h1>Lesson</h1>
-                    <span class="code">SWP391</span>
+                    <span class="code">${param.name}</span>
                 </div>
                 <a href="lesson-create?subjectId=${param.id}" class="add-btn">
                     + Add New Lesson
@@ -244,7 +239,8 @@
             </table>
 
             <div class="pagination">
-                <span>Page ${currentPage} of ${totalPages}</span>
+                
+                <span>   <a href="list-subject" class="btn btn-back">← Back to Subject List</a></span>
                 <div class="page-controls">
                     <c:if test="${currentPage > 1}">
                         <a href="viewLesson?id=${idParam}&search=${search}&status=${status}&page=${currentPage - 1}">

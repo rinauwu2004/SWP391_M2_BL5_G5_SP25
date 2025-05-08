@@ -22,12 +22,14 @@
             }
         </style>
     </head>
-    <body class="p-4">
+    <body class="">
+        <c:import url="../sidebar.jsp" />
 
         <div class="notification">
             <c:import url="../../../notification.jsp" />
         </div>
-
+<main class="main-content">
+      </div>
         <div class="container">
             <h3 class="mb-4">Module Management (Lesson: ${lessonName})</h3>
 

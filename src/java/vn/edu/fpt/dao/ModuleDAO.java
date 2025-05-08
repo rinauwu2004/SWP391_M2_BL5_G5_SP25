@@ -167,30 +167,76 @@ public class ModuleDAO extends DBContext {
         return module;
     }
 
-    public boolean updateModule(int id, String name, String description, String url) throws SQLException {
-        String sql = "UPDATE Module SET name = ?, description = ?, url = ? WHERE id = ?";
-        try (Connection conn = new DBContext().connection; PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, name);
-            stmt.setString(2, description);
-            stmt.setString(3, url);
-            stmt.setInt(4, id);
-            stmt.executeUpdate();
-        } catch (Exception e) {
+    public boolean updateModule(int id, String name, String description, String url) {
+        String getLessonIdSql = "SELECT lesson_id FROM Module WHERE id = ?";
+        String checkSql = "SELECT COUNT(*) FROM Module WHERE name = ? AND lesson_id = ? AND id <> ?";
+        String updateSql = "UPDATE Module SET name = ?, description = ?, url = ? WHERE id = ?";
+
+        try (Connection conn = new DBContext().connection; PreparedStatement getLessonStmt = conn.prepareStatement(getLessonIdSql)) {
+
+            getLessonStmt.setInt(1, id);
+            ResultSet rs = getLessonStmt.executeQuery();
+
+            if (!rs.next()) {
+                System.out.println("Module not found.");
+                return false;
+            }
+
+            int lessonId = rs.getInt("lesson_id");
+
+            try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+                checkStmt.setString(1, name);
+                checkStmt.setInt(2, lessonId);
+                checkStmt.setInt(3, id);
+
+                ResultSet checkRs = checkStmt.executeQuery();
+                if (checkRs.next() && checkRs.getInt(1) > 0) {
+                    System.out.println("Module name already exists in this lesson.");
+                    return false;
+                }
+            }
+
+            try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+                updateStmt.setString(1, name);
+                updateStmt.setString(2, description);
+                updateStmt.setString(3, url);
+                updateStmt.setInt(4, id);
+                updateStmt.executeUpdate();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
             return false;
         }
+
         return true;
     }
 
     public boolean createModule(int lessonId, String name, String description, String url) {
-        String sql = "INSERT INTO Module (name, description, url, lesson_id) VALUES (?, ?, ?, ?)";
-        try (Connection conn = new DBContext().connection; PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, name);
-            stmt.setString(2, description);
-            stmt.setString(3, url);
-            stmt.setInt(4, lessonId);
+        String checkSql = "SELECT COUNT(*) FROM Module WHERE name = ? AND lesson_id = ?";
+        String insertSql = "INSERT INTO Module (name, description, url, lesson_id) VALUES (?, ?, ?, ?)";
 
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
+        try (Connection conn = new DBContext().connection; PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+
+            checkStmt.setString(1, name);
+            checkStmt.setInt(2, lessonId);
+            ResultSet rs = checkStmt.executeQuery();
+
+            if (rs.next() && rs.getInt(1) > 0) {
+                System.out.println("Module name already exists in this lesson.");
+                return false;
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(insertSql)) {
+                stmt.setString(1, name);
+                stmt.setString(2, description);
+                stmt.setString(3, url);
+                stmt.setInt(4, lessonId);
+
+                int rowsAffected = stmt.executeUpdate();
+                return rowsAffected > 0;
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
