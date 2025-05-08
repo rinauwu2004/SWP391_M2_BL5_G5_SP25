@@ -122,49 +122,4 @@ public class PasswordHash {
         String hash = hashPassword(password, salt);
         return new String[]{hash, salt};
     }
-    
-    /**
-     * Main method to generate password hash and salt for testing
-     * @param args command line arguments
-     */
-    public static void main(String[] args) {
-        String password = "123";
-        
-        System.out.println("Password Hash Generator");
-        System.out.println("======================");
-        
-        // Option to provide password or use default
-        System.out.print("Enter password (or press Enter to use 'password123'): ");
-        
-       
-        
-        // Generate and display results
-        String salt = generateSalt();
-        String hash = hashPassword(password, salt);
-        
-        System.out.println("\nResults:");
-        System.out.println("-----------------------");
-        System.out.println("Password: " + password);
-        System.out.println("Salt: " + salt);
-        System.out.println("Hash: " + hash);
-        System.out.println("-----------------------");
-        
-        // SQL insert example
-        System.out.println("\nExample SQL Insert:");
-        System.out.println("INSERT INTO [User] (username, password_hash, password_salt, ...) VALUES");
-        System.out.println("('testuser', '" + hash + "', '" + salt + "', ...);");
-        
-        // Verify the password
-        System.out.println("\nVerifying password: " + verifyPassword(password, hash, salt));
-        
-        // Show multiple generations for the same password
-        System.out.println("\nMultiple generations for the same password:");
-        for (int i = 0; i < 3; i++) {
-            String newSalt = generateSalt();
-            String newHash = hashPassword(password, newSalt);
-            System.out.println("Salt " + (i+1) + ": " + newSalt);
-            System.out.println("Hash " + (i+1) + ": " + newHash);
-            System.out.println();
-        }
-    }
 }

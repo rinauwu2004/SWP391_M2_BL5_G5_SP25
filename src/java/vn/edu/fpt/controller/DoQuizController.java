@@ -113,7 +113,7 @@ public class DoQuizController extends HttpServlet {
 
         if (questions.isEmpty()) {
             request.setAttribute("errorMessage", "No questions found for this quiz.");
-            request.getRequestDispatcher("/error.jsp").forward(request, response);
+            request.getRequestDispatcher("../errorPage.jsp").forward(request, response);
             return;
         }
 

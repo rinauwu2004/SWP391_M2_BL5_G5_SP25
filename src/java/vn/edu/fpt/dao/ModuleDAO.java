@@ -210,10 +210,12 @@ public class ModuleDAO extends DBContext {
         }
     }
 
-    public int countAllModules() {
+    public int countAllModules(int userId) {
         int count = 0;
-        String sql = "SELECT COUNT(*) AS moduleCount FROM Module";
-
+        String sql = """
+                     SELECT COUNT(*) AS moduleCount FROM Module
+                     WHERE userId = ?
+                     """;
         try (Connection conn = new DBContext().connection; PreparedStatement stm = conn.prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
 
             if (rs.next()) {

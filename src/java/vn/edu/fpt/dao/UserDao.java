@@ -470,7 +470,8 @@ public class UserDao extends DBContext {
                          [date_of_birth] = ?,
                          [phone_number] = ?,
                          [address] = ?,
-                         [country_id] = ?
+                         [country_id] = ?,
+                         [status_id] = ?
                      WHERE [id] = ?
                      """;
 
@@ -481,7 +482,8 @@ public class UserDao extends DBContext {
             stm.setString(4, user.getPhoneNumber());
             stm.setString(5, user.getAddress());
             stm.setInt(6, user.getCountry().getId());
-            stm.setInt(7, user.getId());
+            stm.setInt(7, user.getStatus().getId());
+            stm.setInt(8, user.getId());
 
             stm.executeUpdate();
         } catch (SQLException ex) {

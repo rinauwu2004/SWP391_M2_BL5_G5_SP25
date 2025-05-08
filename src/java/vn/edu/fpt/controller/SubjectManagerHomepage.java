@@ -69,9 +69,8 @@ public class SubjectManagerHomepage extends HttpServlet {
         }
         request.setAttribute("totalLessons", totalLessons);
 
-        // Get total modules count
-        // Since there's no direct method to count all modules, we'll set a placeholder
-        // In a real implementation, you would add a method to ModuleDAO to count all modules
+        int totalModules = 0;
+        
         request.setAttribute("totalModules", 0);
 
         // Get recent subjects (limit to 5)

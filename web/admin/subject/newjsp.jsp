@@ -28,11 +28,9 @@
         </style>
     </head>
     <body class="p-4">
-
-        <div class="container">
             <h3 class="mb-4">Subject Management</h3>
             <div class="d-flex justify-content-between mb-3">
-                <input type="text" class="form-control w-50" placeholder="Search subjects...">
+                <input type="text" class="form-control w-50" place holder="Search subjects...">
                 <select class="form-select w-25">
                     <option>Status Filter</option>
                     <option value="1">Active</option>
@@ -82,27 +80,27 @@
 
             <!-- Pagination -->
             <!-- Pagination -->
-<nav>
-    <ul class="pagination justify-content-end">
-        <c:if test="${currentPage > 1}">
-            <li class="page-item">
-                <a class="page-link" href="?page=${currentPage - 1}">«</a>
-            </li>
-        </c:if>
+            <nav>
+                <ul class="pagination justify-content-end">
+                    <c:if test="${currentPage > 1}">
+                        <li class="page-item">
+                            <a class="page-link" href="?page=${currentPage - 1}">«</a>
+                        </li>
+                    </c:if>
 
-        <c:forEach begin="1" end="${totalPages}" var="i">
-            <li class="page-item ${i == currentPage ? 'active' : ''}">
-                <a class="page-link" href="?page=${i}">${i}</a>
-            </li>
-        </c:forEach>
+                    <c:forEach begin="1" end="${totalPages}" var="i">
+                        <li class="page-item ${i == currentPage ? 'active' : ''}">
+                            <a class="page-link" href="?page=${i}">${i}</a>
+                        </li>
+                    </c:forEach>
 
-        <c:if test="${currentPage < totalPages}">
-            <li class="page-item">
-                <a class="page-link" href="?page=${currentPage + 1}">»</a>
-            </li>
-        </c:if>
-    </ul>
-</nav>
+                    <c:if test="${currentPage < totalPages}">
+                        <li class="page-item">
+                            <a class="page-link" href="?page=${currentPage + 1}">»</a>
+                        </li>
+                    </c:if>
+                </ul>
+            </nav>
 
         </div>
 

@@ -39,7 +39,7 @@
                         <c:choose>
                             <c:when test="${not empty sessionScope.user}">
                                 <div class="user-greeting">
-                                    <a href="<%=request.getContextPath()%>/user/view-profile">Hello, ${sessionScope.user.lastName} ${sessionScope.user.firstName}</a>
+                                    <a href="<%=request.getContextPath()%>/user/view-profile">Hello, ${sessionScope.user.firstName} ${sessionScope.user.lastName}</a>
                                     <a href="<%=request.getContextPath()%>/signout" class="btn btn-outline btn-sm">Logout</a>
                                 </div>
                             </c:when>

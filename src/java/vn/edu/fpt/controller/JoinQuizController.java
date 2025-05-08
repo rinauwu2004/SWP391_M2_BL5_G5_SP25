@@ -52,6 +52,10 @@ public class JoinQuizController extends HttpServlet {
             String errorMessage = "Invalid quiz code.";
             request.setAttribute("errorMessage", errorMessage);
             request.getRequestDispatcher("../joinQuiz.jsp").forward(request, response);
+        } else if (!quiz.getStatus().equals("Active")) {
+            String errorMessage = "Quiz is not started.";
+            request.setAttribute("errorMessage", errorMessage);
+            request.getRequestDispatcher("../joinQuiz.jsp").forward(request, response);
         } else {
             response.sendRedirect(request.getContextPath() + "/quiz/do?quizId=" + quiz.getId());
         }

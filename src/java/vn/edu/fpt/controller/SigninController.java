@@ -19,6 +19,7 @@ import static vn.edu.fpt.util.PasswordEncryption.checkPassword;
  * @author Rinaaaa
  */
 public class SigninController extends HttpServlet {
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -31,7 +32,7 @@ public class SigninController extends HttpServlet {
                 }
             }
         }
-        
+
         request.setAttribute("googleLoginURL", vn.edu.fpt.util.GoogleLogin.getGoogleLoginURL());
         request.getRequestDispatcher("/Signin.jsp").forward(request, response);
     }
@@ -48,7 +49,7 @@ public class SigninController extends HttpServlet {
         if (user != null) {
             try {
                 boolean matched = checkPassword(password, user.getHashPassword(), user.getSaltPassword());
-                if (matched) {
+                if (matched && user.getStatus().getName().equals("Active")) {
                     request.getSession().setAttribute("user", user);
                     if ("on".equals(remember)) {
                         Cookie usernameCookie = new Cookie("remember_username", username);
@@ -63,24 +64,36 @@ public class SigninController extends HttpServlet {
                     // Redirect based on role ID
                     int roleId = user.getRole().getId();
                     switch (roleId) {
-                        case 1: // Admin
+                        case 1 -> {
+                            // Admin
                             response.sendRedirect(request.getContextPath() + "/admin/home");
-                            break;
-                        case 2: // Student
+                            return;
+                        }
+                        case 2 -> {
+                            // Student
                             response.sendRedirect(request.getContextPath() + "/home");
-                            break;
-                        case 3: // Teacher
+                            return;
+                        }
+                        case 3 -> {
+                            // Teacher
                             response.sendRedirect(request.getContextPath() + "/teacher/home");
-                            break;
-                        case 4: //Subject Manager
+                            return;
+                        }
+                        case 4 -> {
+                            //Subject Manager
                             response.sendRedirect(request.getContextPath() + "/subjectmanager/home");
-                            break;
-                        default:
+                            return;
+                        }
+                        default -> {
                             response.sendRedirect(request.getContextPath() + "/home");
-                            break;
+                            return;
+                        }
                     }
-                } else {
+                } else if (!matched) {
                     request.setAttribute("error", "Invalid username or password.");
+                    request.getRequestDispatcher("/Signin.jsp").forward(request, response);
+                } else if (!user.getStatus().getName().equals("Active")) {
+                    request.setAttribute("error", "Your account is NOT ACTIVE. Please contact with administrator to sign in!");
                     request.getRequestDispatcher("/Signin.jsp").forward(request, response);
                 }
             } catch (Exception e) {
@@ -91,9 +104,6 @@ public class SigninController extends HttpServlet {
             request.getRequestDispatcher("/Signin.jsp").forward(request, response);
         }
     }
-
-
-    
 
     /**
      * Returns a short description of the servlet.

@@ -599,7 +599,7 @@
     <body>
         <aside class="sidebar">
             <div class="sidebar-header">
-                <a href="<%=request.getContextPath()%>/admin/home" class="logo">
+                <a href="<%=request.getContextPath()%>/subjectmanager/home" class="logo">
                     <span class="logo-icon"><i class="fas fa-puzzle-piece"></i></span>
                     <span class="logo-text">QuizMaster</span>
                 </a>
@@ -684,7 +684,7 @@
                         <fmt:formatDate value="${now}" pattern="EEEE, MMMM d, yyyy" />
                     </p>
                 </div>
-                <a href="<%=request.getContextPath()%>/list-subject" class="btn btn-primary">
+                <a href="<%=request.getContextPath()%>/addSubject" class="btn btn-primary">
                     <i class="fas fa-plus mr-2"></i> Add New Subject
                 </a>
             </div>
@@ -784,7 +784,7 @@
                                 </td>
                                 <td><fmt:formatDate value="${subject.createdAt}" pattern="MMM d, yyyy" /></td>
                                 <td>
-                                    <a href="<%=request.getContextPath()%>/edit-subject?id=${subject.id}" class="btn btn-sm btn-outline">
+                                    <a href="<%=request.getContextPath()%>/editSubject?id=${subject.id}" class="btn btn-sm btn-outline">
                                         <i class="fas fa-edit"></i> Edit
                                     </a>
                                 </td>
@@ -815,7 +815,7 @@
                         <p class="action-description">View, add, edit or delete subjects</p>
                     </a>
 
-                    <a href="<%=request.getContextPath()%>/subject-manager/lessons" class="action-card">
+                    <a href="#" class="action-card">
                         <div class="action-icon icon-lessons">
                             <i class="fas fa-bookmark"></i>
                         </div>
@@ -823,7 +823,7 @@
                         <p class="action-description">Organize lessons for your subjects</p>
                     </a>
 
-                    <a href="<%=request.getContextPath()%>/subject-manager/modules" class="action-card">
+                    <a href="#" class="action-card">
                         <div class="action-icon icon-modules">
                             <i class="fas fa-cube"></i>
                         </div>

@@ -652,7 +652,7 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="roleId" class="form-label">Role<span class="required">*</span></label>
-                                <select id="roleId" name="roleId" class="form-control" required>
+                                <select id="roleId" name="roleId" class="form-control" required readonly>
                                     <c:forEach var="role" items="${roles}">
                                         <option value="${role.id}" ${formData.roleId != null ? (formData.roleId eq role.id ? 'selected' : '') : (user.role.id eq role.id ? 'selected' : '')}>${role.name}</option>
                                     </c:forEach>

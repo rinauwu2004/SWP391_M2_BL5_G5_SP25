@@ -19,6 +19,42 @@
                 box-sizing: border-box;
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             }
+            
+            .back-button {
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background-color: #f3f4f6;
+                border: none;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                transition: all 0.3s ease;
+            }
+
+            .back-button:hover {
+                background-color: #e5e7eb;
+                transform: translateY(-2px);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .back-button:active {
+                transform: translateY(0);
+            }
+
+            .back-arrow {
+                width: 10px;
+                height: 10px;
+                border: solid #4b5563;
+                border-width: 0 2px 2px 0;
+                transform: rotate(135deg);
+                margin: 1px 0px 0px 3px;
+            }
 
             body {
                 display: flex;
@@ -95,15 +131,26 @@
             .arrow-icon {
                 margin-left: 8px;
             }
+            
+            .er-ms {
+                margin-bottom: 1.5rem; 
+                color:red; 
+                text-align: center; 
+                font-size: 14px;
+            }
         </style>
     </head>
     <body>
+        <!-- Back Button -->
+        <button class="back-button" onclick="window.history.back()">
+            <div class="back-arrow"></div>
+        </button>
+        
         <div class="card">
             <h1>Join Quiz</h1>
             <p class="description">Enter the quiz code provided by your teacher</p>
-
             <c:if test="${not empty errorMessage}">
-                <p style="margin-top: 5px; color:red; text-align: center; font-size: 14px;">${errorMessage}</p>
+                <p class="er-ms">${errorMessage}</p>
             </c:if>
 
             <form action="<%=request.getContextPath()%>/quiz/join" method="post">
